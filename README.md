@@ -1,6 +1,10 @@
-# Lime Window Manager
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/banner_white.png">
+  <source media="(prefers-color-scheme: light)" srcset=".github/banner_black.png">
+  <img alt="LimeOS Banner">
+</picture>
 
-> **NOTE:** This project is still in development and is not ready for use.
+###
 
 The Lime Window Manager is a window manager for X11, seamlessly blending the 
 best of both tiled and floating window management. Designed with simplicity and 
@@ -8,6 +12,8 @@ elegance in mind, it aims to provide a clean and uncluttered interface while
 still delivering all the essential functionalities that users expect from a 
 modern window manager. It is an ideal choice for users who seek a balance 
 between aesthetics and productivity.
+
+> **NOTE:** This project is still in development and is not ready for use.
 
 ## Building & Running
 
