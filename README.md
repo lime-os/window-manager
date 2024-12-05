@@ -42,8 +42,8 @@ primary window manager, or you can use a nested X server like `Xephyr` in order
 to run the window manager within your currently active window manager.
 
 ```bash
-DISPLAY=:1 ./bin/lime-wm
 Xephyr -br -ac -noreset -screen 800x600 :1
+DISPLAY=:1 ./bin/lime-wm
 ```
 
 Then if you'd like, you could start an application on the new display as follows:
