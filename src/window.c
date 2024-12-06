@@ -8,13 +8,12 @@ bool is_dragging = false;
 int drag_start_x = 0, drag_start_y = 0;
 int window_start_x = 0, window_start_y = 0;
 
-static const long event_mask =
-    SubstructureRedirectMask |
-    SubstructureNotifyMask |
+static const long frame_event_mask =
     ExposureMask |
     ButtonPressMask |
     ButtonReleaseMask |
-    PointerMotionMask;
+    PointerMotionMask |
+    SubstructureNotifyMask;
 
 static void configure_window(Display *display, XConfigureRequestEvent *configure_request)
 {
@@ -186,7 +185,7 @@ static void create_frame(Display *display, Window root_window, Window target_win
 
     register_frame(frame_window, target_window);
 
-    XSelectInput(display, frame_window, event_mask);
+    XSelectInput(display, frame_window, frame_event_mask);
     XAddToSaveSet(display, target_window);
     XReparentWindow(display, target_window, frame_window, 0, 15);
     XMapWindow(display, frame_window);
@@ -209,6 +208,7 @@ HANDLE(ConfigureRequest)
 HANDLE(MapRequest)
 {
     create_frame(display, root_window, event->xmaprequest.window);
+    add_to_client_list_atom(display, root_window, event->xmaprequest.window);
 }
 
 HANDLE(DestroyNotify)
@@ -218,6 +218,8 @@ HANDLE(DestroyNotify)
     {
         destroy_frame(display, *frame_window);
     }
+
+    remove_from_client_list_atom(display, root_window, event->xdestroywindow.window);
 }
 
 HANDLE(ButtonPress)
@@ -249,6 +251,17 @@ HANDLE(MotionNotify)
     {
         XMotionEvent motion_event = event->xmotion;
         update_dragging(display, motion_event.x_root, motion_event.y_root);
+    }
+}
+
+HANDLE(ClientMessage)
+{
+    if (event->xclient.message_type == wm_protocols &&
+        (Atom)event->xclient.data.l[0] == wm_delete_window)
+    {
+        // Note that the DestroyNotify handler will handle the cleanup of the
+        // parent frame as well.
+        XDestroyWindow(display, event->xclient.window);
     }
 }
 

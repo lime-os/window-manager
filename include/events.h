@@ -8,8 +8,8 @@ typedef struct {
     EventHandler *event_handler;
 } EventHandlerMap;
 
-extern void initialize_event_loop(Display *display, Window root_window);
-extern void register_event_handler(int event_type, EventHandler event_handler);
+void initialize_event_loop(Display *display, Window root_window);
+void register_event_handler(int event_type, EventHandler event_handler);
 
 #define EVENT_HANDLER_PARAMS \
     __attribute__((unused)) XEvent *event, \
