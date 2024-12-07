@@ -41,6 +41,10 @@ You can now either run the executable directly in order to use it as your
 primary window manager, or you can use a nested X server like `Xephyr` in order
 to run the window manager within your currently active window manager.
 
+> **NOTE:** Testing this window manager within a Wayland compositor may cause
+conflicts. We recommend using an X11-based window manager as your parent
+environment to prevent unexpected behavior.
+
 ```bash
 Xephyr -br -ac -noreset -screen 800x600 :1
 DISPLAY=:1 ./bin/lime-wm
