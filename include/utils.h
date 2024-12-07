@@ -1,6 +1,11 @@
 #pragma once
 #include "all.h"
 
+typedef struct {
+    int x;
+    int y;
+} Vector2;
+
 unsigned long rgb_to_hex(double r, double g, double b);
 
 unsigned long rgba_to_hex(double r, double g, double b, double a);

@@ -1,5 +1,16 @@
 #include "all.h"
 
+#define TITLE_BAR_HEIGHT 15
+
+#define BUTTON_SIZE 15
+#define BUTTON_PADDING 5
+
+typedef enum {
+    BUTTON_CLOSE,
+    BUTTON_MAXIMIZE,
+    BUTTON_MINIMIZE
+} ButtonType;
+
 FrameMap *frame_map = NULL;
 int frame_map_size = 0;
 
@@ -107,6 +118,19 @@ static Window *find_parent_frame(Window window)
     return NULL;
 }
 
+static Window *find_frame_child(Window frame_window)
+{
+    for (int i = 0; i < frame_map_size; i++)
+    {
+        if(frame_map[i].frame_window == frame_window)
+        {
+            return &frame_map[i].child_window;
+        }
+    }
+
+    return NULL;
+}
+
 static void unregister_frame(Window frame_window)
 {
     int wasFound = false;
@@ -141,6 +165,81 @@ static void unregister_frame(Window frame_window)
     }
 }
 
+static Vector2 calculate_button_position(int window_width, ButtonType type) {
+    Vector2 pos;
+    
+    // Calculate starting position.
+    pos.x = window_width - BUTTON_PADDING - BUTTON_SIZE;
+    pos.y = (TITLE_BAR_HEIGHT - BUTTON_SIZE) / 2;
+    
+    // Calculate the position based on the button type.
+    switch (type) {
+        case BUTTON_CLOSE:
+            pos.x = pos.x;
+            break;
+        case BUTTON_MAXIMIZE:
+            pos.x -= (BUTTON_SIZE + BUTTON_PADDING);
+            break;
+        case BUTTON_MINIMIZE:
+            pos.x -= 2 * (BUTTON_SIZE + BUTTON_PADDING);
+            break;
+        default:
+            break;
+    }
+    
+    return pos;
+}
+
+static bool is_button_hit(int x, int y, int window_width, ButtonType type) {
+    Vector2 button_pos = calculate_button_position(window_width, type);
+    return (x >= button_pos.x && 
+            x <= button_pos.x + BUTTON_SIZE &&
+            y >= button_pos.y && 
+            y <= button_pos.y + BUTTON_SIZE);
+}
+
+static void draw_button(cairo_t *cr, int x, int y, ButtonType type)
+{
+    cairo_set_source_rgb(cr, 1, 1, 1);
+    cairo_set_line_width(cr, 2);
+
+    switch (type)
+    {
+        case BUTTON_CLOSE:
+            cairo_move_to(cr,
+                x + BUTTON_PADDING,
+                y + BUTTON_PADDING);
+            cairo_line_to(cr,
+                x + BUTTON_SIZE - BUTTON_PADDING, 
+                y + BUTTON_SIZE - BUTTON_PADDING);
+            cairo_move_to(cr,
+                x + BUTTON_SIZE - BUTTON_PADDING, 
+                y + BUTTON_PADDING);
+            cairo_line_to(cr,
+                x + BUTTON_PADDING, 
+                y + BUTTON_SIZE - BUTTON_PADDING);
+            break;
+        case BUTTON_MAXIMIZE:
+            cairo_rectangle(cr,
+                x + BUTTON_PADDING, 
+                y + BUTTON_PADDING,
+                BUTTON_SIZE - (2 * BUTTON_PADDING),
+                BUTTON_SIZE - (2 * BUTTON_PADDING));
+            break;
+        case BUTTON_MINIMIZE:
+            cairo_rectangle(cr,
+                x + BUTTON_PADDING,
+                y + BUTTON_SIZE - (2 * BUTTON_PADDING),
+                BUTTON_SIZE - (2 * BUTTON_PADDING),
+                BUTTON_PADDING);
+            break;
+        default:
+            break;
+    }
+
+    cairo_stroke(cr);
+}
+
 static void draw_frame(Display *display, Window frame_window, int width, int height)
 {
     cairo_surface_t *surface;
@@ -153,6 +252,10 @@ static void draw_frame(Display *display, Window frame_window, int width, int hei
     cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
     cairo_rectangle(cr, 0, 0, width, 15);
     cairo_fill(cr);
+
+    // Draw close button.
+    Vector2 button_pos = calculate_button_position(width, BUTTON_CLOSE);
+    draw_button(cr, button_pos.x, button_pos.y, BUTTON_CLOSE);
 
     // Set the color for the border around the window.
     cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
@@ -228,6 +331,27 @@ HANDLE(ButtonPress)
     {
         XButtonEvent button_event = event->xbutton;
 
+        // Handle `close` button click.
+        XWindowAttributes attr;
+        XGetWindowAttributes(display, button_event.window, &attr);
+        int window_width = attr.width;
+        if(is_button_hit(button_event.x, button_event.y, window_width, BUTTON_CLOSE))
+        {
+            Window *child_window = find_frame_child(button_event.window);
+            if(child_window != NULL)
+            {
+                XEvent close_event;
+                close_event.xclient.type = ClientMessage;
+                close_event.xclient.window = *child_window;
+                close_event.xclient.message_type = wm_protocols;
+                close_event.xclient.format = 32;
+                close_event.xclient.data.l[0] = wm_delete_window;
+                close_event.xclient.data.l[1] = CurrentTime;
+                XSendEvent(display, *child_window, False, NoEventMask, &close_event);
+                return;
+            }
+        }
+
         focus_window(display, button_event.window);
 
         if (is_dragging == false)
@@ -259,8 +383,6 @@ HANDLE(ClientMessage)
     if (event->xclient.message_type == wm_protocols &&
         (Atom)event->xclient.data.l[0] == wm_delete_window)
     {
-        // Note that the DestroyNotify handler will handle the cleanup of the
-        // parent frame as well.
         XDestroyWindow(display, event->xclient.window);
     }
 }
