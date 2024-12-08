@@ -1,5 +1,5 @@
 #pragma once
-#include "all.h"
+#include "../all.h"
 
 #define CFG_DIRECTORY "~/.config/lime"
 #define CFG_FILE_PATH "~/.config/lime/wm.config"

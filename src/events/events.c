@@ -1,4 +1,4 @@
-#include "all.h"
+#include "../all.h"
 
 EventHandlerMap *event_handler_map = NULL;
 static int event_handler_map_size = 0;

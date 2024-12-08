@@ -1,4 +1,4 @@
-#include "all.h"
+#include "../all.h"
 
 Atom wm_protocols;
 Atom wm_delete_window;

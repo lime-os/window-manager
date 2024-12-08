@@ -1,26 +1,27 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iinclude
+CFLAGS = -Wall -Wextra
 LIBS = -lX11 -lcairo
+
 SRCDIR = src
-INCDIR = include
 OBJDIR = obj
 BINDIR = bin
 
 TARGET = $(BINDIR)/lime-wm
 
-SOURCES = $(wildcard $(SRCDIR)/*.c)
-OBJECTS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
+SOURCES = $(shell find $(SRCDIR) -name '*.c')
+OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+
+INCLUDES = $(shell find $(SRCDIR) -type d -exec printf "-I{} " \;)
+CFLAGS += $(INCLUDES)
 
 all: $(TARGET)
 
-# Build the target executable.
 $(TARGET): $(OBJECTS)
 	@mkdir -p $(BINDIR)
 	$(CC) $(OBJECTS) -o $@ $(LIBS)
 
-# Build object files.
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:

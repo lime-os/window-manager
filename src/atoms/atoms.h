@@ -1,5 +1,5 @@
 #pragma once
-#include "all.h"
+#include "../all.h"
 
 extern Atom wm_protocols;
 extern Atom wm_delete_window;

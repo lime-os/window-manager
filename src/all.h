@@ -14,9 +14,10 @@
 #include <errno.h>
 
 #include "limits.h"
-#include "atoms.h"
-#include "events.h"
-#include "config.h"
-#include "utils.h"
-#include "window.h"
-#include "background.h"
+
+#include "atoms/atoms.h"
+#include "events/events.h"
+#include "config/config.h"
+#include "utils/utils.h"
+#include "window/window.h"
+#include "background/background.h"

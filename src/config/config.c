@@ -1,4 +1,4 @@
-#include "all.h"
+#include "../all.h"
 
 static ConfigEntry config_entries[CFG_MAX_ENTRIES];
 static int config_count = 0;

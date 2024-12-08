@@ -1,4 +1,4 @@
-#include "all.h"
+#include "../all.h"
 
 /**
  * @brief Converts RGB values to a hexadecimal representation.

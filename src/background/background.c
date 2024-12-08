@@ -1,4 +1,4 @@
-#include "all.h"
+#include "../all.h"
 
 static cairo_t *cr = NULL;
 static cairo_surface_t *xlib_surface = NULL;

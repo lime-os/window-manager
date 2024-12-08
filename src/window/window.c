@@ -1,4 +1,4 @@
-#include "all.h"
+#include "../all.h"
 
 #define TITLE_BAR_HEIGHT 15
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "all.h"
+#include "../all.h"
 
 typedef void EventHandler(XEvent *event, Display *display, Window root_window);
 

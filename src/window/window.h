@@ -1,5 +1,5 @@
 #pragma once
-#include "all.h"
+#include "../all.h"
 
 typedef struct {
     Window frame_window;
