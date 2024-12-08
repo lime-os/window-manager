@@ -19,12 +19,13 @@ void initialize_atoms(Display *display, Window root_window)
     wm_protocols = XInternAtom(display, "WM_PROTOCOLS", False);
 
     // Get atom ID for WM_DELETE_WINDOW (ICCCM protocol).
-    // Used in ClientMessage events when a window requests graceful closure.
+    // We send this atom in a ClientMessage to request graceful window closure.
+    // Client can then clean up resources before destroying the window.
     // See: https://tronche.com/gui/x/icccm/sec-4.html#s-4.2.8.1
     wm_delete_window = XInternAtom(display, "WM_DELETE_WINDOW", False);
 
-    // Get atom ID for _NET_CLIENT_LIST - EWMH property that allows 
-    // other applications to query a list of managed windows.
+    // Get atom ID for _NET_CLIENT_LIST.
+    // EWMH property that allows other apps to query a list of managed windows.
     // See: https://specifications.freedesktop.org/wm-spec/1.5/ar01s03.html#id-1.4.4
     net_client_list = XInternAtom(display, "_NET_CLIENT_LIST", False);
 
