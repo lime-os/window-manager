@@ -14,6 +14,7 @@
 #include <errno.h>
 
 #include "limits.h"
+#include "geometry.h"
 
 #include "atoms/atoms.h"
 #include "events/events.h"
