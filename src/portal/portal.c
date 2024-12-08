@@ -11,8 +11,8 @@ typedef enum {
     BUTTON_MINIMIZE
 } ButtonType;
 
-FrameMap *frame_map = NULL;
-int frame_map_size = 0;
+Portal *portals = NULL;
+int portals_count = 0;
 
 Window dragged_window = 0;
 bool is_dragging = false;
@@ -78,26 +78,27 @@ static void stop_dragging()
     is_dragging = false;
 }
 
-static void register_frame(Window frame_window, Window child_window)
+static void register_portal(Window frame_window, Window client_window)
 {
-    FrameMap *buffer = realloc(frame_map, (frame_map_size + 1) * sizeof(FrameMap));
+    Portal *buffer = realloc(portals, (portals_count + 1) * sizeof(Portal));
     if (buffer == NULL)
     {
-        perror("Failed to allocate memory while registering to frame map\n");
+        // TODO Log error.
+        perror("Failed to allocate memory while registering to portal registry\n");
         exit(EXIT_FAILURE);
     }
 
-    frame_map = buffer;
-    frame_map[frame_map_size].frame_window = frame_window;
-    frame_map[frame_map_size].child_window = child_window;
-    frame_map_size++;
+    portals = buffer;
+    portals[portals_count].frame_window = frame_window;
+    portals[portals_count].client_window = client_window;
+    portals_count++;
 }
 
-static bool is_frame(Window window)
+static bool is_frame_window(Window window)
 {
-    for (int i = 0; i < frame_map_size; i++)
+    for (int i = 0; i < portals_count; i++)
     {
-        if (frame_map[i].frame_window == window)
+        if (portals[i].frame_window == window)
         {
             return true;
         }
@@ -105,46 +106,46 @@ static bool is_frame(Window window)
     return false;
 }
 
-static Window *find_parent_frame(Window window)
+static Window *find_frame_window(Window client_window)
 {
-    for (int i = 0; i < frame_map_size; i++)
+    for (int i = 0; i < portals_count; i++)
     {
-        if(frame_map[i].child_window == window)
+        if(portals[i].client_window == client_window)
         {
-            return &frame_map[i].frame_window;
+            return &portals[i].frame_window;
         }
     }
 
     return NULL;
 }
 
-static Window *find_frame_child(Window frame_window)
+static Window *find_client_window(Window frame_window)
 {
-    for (int i = 0; i < frame_map_size; i++)
+    for (int i = 0; i < portals_count; i++)
     {
-        if(frame_map[i].frame_window == frame_window)
+        if(portals[i].frame_window == frame_window)
         {
-            return &frame_map[i].child_window;
+            return &portals[i].client_window;
         }
     }
 
     return NULL;
 }
 
-static void unregister_frame(Window frame_window)
+static void unregister_portal(Window frame_window)
 {
     int wasFound = false;
 
     // Find the index of the frame to be removed.
-    for (int i = 0; i < frame_map_size; i++)
+    for (int i = 0; i < portals_count; i++)
     {
-        if (frame_map[i].frame_window == frame_window)
+        if (portals[i].frame_window == frame_window)
         {
             wasFound = true;
             // Shift all elements after the found index to the left.
-            for (int j = i; j < frame_map_size - 1; j++)
+            for (int j = i; j < portals_count - 1; j++)
             {
-                frame_map[j] = frame_map[j + 1];
+                portals[j] = portals[j + 1];
             }
             break;
         }
@@ -152,24 +153,25 @@ static void unregister_frame(Window frame_window)
 
     if (wasFound)
     {
-        frame_map_size--;
+        portals_count--;
 
         // Resize the array to the new size.
-        FrameMap *buffer = realloc(frame_map, frame_map_size * sizeof(FrameMap));
-        if (buffer == NULL && frame_map_size > 0)
+        Portal *buffer = realloc(portals, portals_count * sizeof(Portal));
+        if (buffer == NULL && portals_count > 0)
         {
-            perror("Failed to allocate memory while unregistering from frame map\n");
+            // TODO Log error.
+            perror("Failed to allocate memory while unregistering from portal registry\n");
             exit(EXIT_FAILURE);
         }
-        frame_map = buffer;
+        portals = buffer;
     }
 }
 
-static Vector2 calculate_button_position(int window_width, ButtonType type) {
+static Vector2 calculate_button_position(int frame_window_width, ButtonType type) {
     Vector2 pos;
     
     // Calculate starting position.
-    pos.x = window_width - BUTTON_PADDING - BUTTON_SIZE;
+    pos.x = frame_window_width - BUTTON_PADDING - BUTTON_SIZE;
     pos.y = (TITLE_BAR_HEIGHT - BUTTON_SIZE) / 2;
     
     // Calculate the position based on the button type.
@@ -190,8 +192,8 @@ static Vector2 calculate_button_position(int window_width, ButtonType type) {
     return pos;
 }
 
-static bool is_button_hit(int x, int y, int window_width, ButtonType type) {
-    Vector2 button_pos = calculate_button_position(window_width, type);
+static bool is_button_hit(int x, int y, int frame_window_width, ButtonType type) {
+    Vector2 button_pos = calculate_button_position(frame_window_width, type);
     return (x >= button_pos.x && 
             x <= button_pos.x + BUTTON_SIZE &&
             y >= button_pos.y && 
@@ -274,10 +276,10 @@ static void redraw_frame(Display *display, Window frame_window)
     draw_frame(display, frame_window, attr.width, attr.height);
 }
 
-static void create_frame(Display *display, Window root_window, Window target_window)
+static void create_portal(Display *display, Window root_window, Window client_window)
 {
     XWindowAttributes attr;
-    XGetWindowAttributes(display, target_window, &attr);
+    XGetWindowAttributes(display, client_window, &attr);
 
     Window frame_window = XCreateSimpleWindow(
         display,
@@ -286,21 +288,21 @@ static void create_frame(Display *display, Window root_window, Window target_win
         attr.width, attr.height,
         2, 0x000000, 0xFFFFFF);
 
-    register_frame(frame_window, target_window);
+    register_portal(frame_window, client_window);
 
     XSelectInput(display, frame_window, frame_event_mask);
-    XAddToSaveSet(display, target_window);
-    XReparentWindow(display, target_window, frame_window, 0, 15);
+    XAddToSaveSet(display, client_window);
+    XReparentWindow(display, client_window, frame_window, 0, 15);
     XMapWindow(display, frame_window);
-    XMapWindow(display, target_window);
+    XMapWindow(display, client_window);
 
     draw_frame(display, frame_window, attr.width, attr.height + 15);
 }
 
-static void destroy_frame(Display *display, Window frame_window)
+static void destroy_portal(Display *display, Window frame_window)
 {
     XDestroyWindow(display, frame_window);
-    unregister_frame(frame_window);
+    unregister_portal(frame_window);
 }
 
 HANDLE(ConfigureRequest)
@@ -310,16 +312,16 @@ HANDLE(ConfigureRequest)
 
 HANDLE(MapRequest)
 {
-    create_frame(display, root_window, event->xmaprequest.window);
+    create_portal(display, root_window, event->xmaprequest.window);
     add_to_client_list_atom(display, root_window, event->xmaprequest.window);
 }
 
 HANDLE(DestroyNotify)
 {
-    Window *frame_window = find_parent_frame(event->xdestroywindow.window);
+    Window *frame_window = find_frame_window(event->xdestroywindow.window);
     if (frame_window != NULL)
     {
-        destroy_frame(display, *frame_window);
+        destroy_portal(display, *frame_window);
     }
 
     remove_from_client_list_atom(display, root_window, event->xdestroywindow.window);
@@ -337,17 +339,17 @@ HANDLE(ButtonPress)
         int window_width = attr.width;
         if(is_button_hit(button_event.x, button_event.y, window_width, BUTTON_CLOSE))
         {
-            Window *child_window = find_frame_child(button_event.window);
-            if(child_window != NULL)
+            Window *client_window = find_client_window(button_event.window);
+            if(client_window != NULL)
             {
                 XEvent close_event;
                 close_event.xclient.type = ClientMessage;
-                close_event.xclient.window = *child_window;
+                close_event.xclient.window = *client_window;
                 close_event.xclient.message_type = wm_protocols;
                 close_event.xclient.format = 32;
                 close_event.xclient.data.l[0] = wm_delete_window;
                 close_event.xclient.data.l[1] = CurrentTime;
-                XSendEvent(display, *child_window, False, NoEventMask, &close_event);
+                XSendEvent(display, *client_window, False, NoEventMask, &close_event);
                 return;
             }
         }
@@ -392,7 +394,7 @@ HANDLE(Expose)
     if (event->xexpose.count == 0)
     {
         Window exposed_window = event->xexpose.window;
-        if (is_frame(exposed_window))
+        if (is_frame_window(exposed_window))
         {
             redraw_frame(display, exposed_window);
         }

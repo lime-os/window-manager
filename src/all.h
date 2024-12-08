@@ -20,5 +20,5 @@
 #include "events/events.h"
 #include "config/config.h"
 #include "utils/utils.h"
-#include "window/window.h"
+#include "portal/portal.h"
 #include "background/background.h"
