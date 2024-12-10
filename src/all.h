@@ -16,9 +16,16 @@
 #include "limits.h"
 #include "geometry.h"
 
+#include "errors/errors.h"
 #include "atoms/atoms.h"
 #include "events/events.h"
 #include "config/config.h"
 #include "utils/utils.h"
-#include "portal/portal.h"
 #include "background/background.h"
+
+#include "portals/portals.h"
+#include "portals/dragging.h"
+#include "portals/focus.h"
+#include "portals/buttons.h"
+#include "portals/frames.h"
+#include "portals/clients.h"

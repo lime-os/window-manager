@@ -13,6 +13,8 @@ int main()
         exit(EXIT_FAILURE);
     }
 
+    XSetErrorHandler(error_handler);
+
     Window root_window = DefaultRootWindow(display);
     XSelectInput(display, root_window, root_event_mask);
     

@@ -86,7 +86,9 @@ HANDLE(Initialize)
 
 HANDLE(Expose)
 {
-    if (event->xexpose.window == root_window && event->xexpose.count == 0)
+    XExposeEvent *_event = &event->xexpose;
+
+    if (_event->window == root_window && _event->count == 0)
     {
         if (strcmp(background_mode, "image") == 0)
         {
