@@ -7,7 +7,7 @@
 ###
 
 The Lime Window Manager is a window manager for X11, seamlessly blending the 
-best of both tiled and floating window management. Designed with simplicity and 
+best of both tiled and floating window management. Designed with minimalism and 
 elegance in mind, it aims to provide a clean and uncluttered interface while 
 still delivering all the essential functionalities that users expect from a 
 modern window manager. It is an ideal choice for users who seek a balance 
