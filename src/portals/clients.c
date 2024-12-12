@@ -37,16 +37,21 @@ HANDLE(ConfigureRequest)
 HANDLE(MapRequest)
 {
     XMapRequestEvent *_event = &event->xmaprequest;
+
+    // Considering a MapRequest event can only be sent by clients, we can
+    // safely assume that the window is a client window.
     Window client_window = _event->window;
 
     setup_client(display, client_window);
-
     add_to_client_list_atom(display, root_window, client_window);
 }
 
 HANDLE(DestroyNotify)
 {
     XDestroyWindowEvent *_event = &event->xdestroywindow;
+
+    // Considering a DestroyNotify event can only be sent by clients, we can
+    // safely assume that the window is a client window.
     Window client_window = _event->window;
 
     remove_from_client_list_atom(display, root_window, client_window);

@@ -120,17 +120,25 @@ HANDLE(MapRequest)
 {
     XMapRequestEvent *_event = &event->xmaprequest;
 
+    // Considering a MapRequest event can only be sent by clients, we can
+    // safely assume that the window is a client window.
+    Window client_window = _event->window;
+
     Portal *portal = find_portal(_event->window);
     if(portal != NULL) return;
 
-    create_portal(display, root_window, _event->window);
+    create_portal(display, root_window, client_window);
 }
 
 HANDLE(DestroyNotify)
 {
     XDestroyWindowEvent *_event = &event->xdestroywindow;
 
-    Portal *portal = find_portal(_event->window);
+    // Considering a DestroyNotify event can only be sent by clients, we can
+    // safely assume that the window is a client window.
+    Window client_window = _event->window;
+
+    Portal *portal = find_portal(client_window);
     if (portal == NULL) return;
 
     destroy_portal(display, portal);
