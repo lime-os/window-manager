@@ -34,7 +34,7 @@ static bool is_button_hit(int x, int y, unsigned int frame_width, ButtonType typ
 }
 
 static void handle_close_button_click(Display *display, Window frame_window) {
-    Portal *portal = find_portal_by_frame_window(frame_window);
+    Portal *portal = find_portal(frame_window);
     if(portal != NULL)
     {
         destroy_portal(display, portal);
@@ -91,17 +91,17 @@ HANDLE(ButtonPress)
 {
     XButtonEvent *_event = &event->xbutton;
 
-    if (_event->button == Button1 && is_frame_window(_event->window))
+    if (_event->button != Button1) return;
+    
+    Window frame_window = find_frame_window(_event->window, _event->subwindow);
+    if(frame_window == 0) return;
+
+    XWindowAttributes attr;
+    XGetWindowAttributes(display, frame_window, &attr);
+    unsigned int frame_width = attr.width;
+
+    if(is_button_hit(_event->x, _event->y, frame_width, BUTTON_CLOSE))
     {
-        Window frame_window = _event->window;
-
-        XWindowAttributes attr;
-        XGetWindowAttributes(display, frame_window, &attr);
-        unsigned int frame_width = attr.width;
-
-        if(is_button_hit(_event->x, _event->y, frame_width, BUTTON_CLOSE))
-        {
-            handle_close_button_click(display, frame_window);
-        }
+        handle_close_button_click(display, frame_window);
     }
 }

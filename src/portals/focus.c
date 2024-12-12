@@ -1,17 +1,20 @@
 #include "../all.h"
 
-static void focus_window(Display *display, Window window) {
-    if (is_client_window(window)) {
-        Window *frame_window = find_frame_window(window);
-        if(frame_window != NULL)
+static void focus_window(Display *display, Window window, Window subwindow) {
+    Window client_window = find_client_window(window, subwindow);
+    if (client_window != 0) {
+        Portal *portal = find_portal(client_window);
+        if(portal != NULL)
         {
-            XRaiseWindow(display, *frame_window);
+            XRaiseWindow(display, portal->frame_window);
         }
         return;
     }
 
-    if (is_frame_window(window)) {
-        XRaiseWindow(display, window);
+    Window frame_window = find_frame_window(window, subwindow);
+    if (frame_window != 0) {
+        XRaiseWindow(display, frame_window);
+        return;
     }
 }
 
@@ -19,7 +22,7 @@ HANDLE(ButtonPress)
 {
     XButtonEvent *_event = &event->xbutton;
 
-    if (_event->button == Button1) {
-        focus_window(display, _event->window);
-    }
+    if (_event->button != Button1) return;
+    
+    focus_window(display, _event->window, _event->subwindow);
 }

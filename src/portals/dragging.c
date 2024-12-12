@@ -38,28 +38,33 @@ HANDLE(ButtonPress)
 {
     XButtonEvent *_event = &event->xbutton;
 
-    if (_event->button == Button1 && is_dragging == false)
-    {
-        start_dragging(display, _event->window, _event->x_root, _event->y_root);
-    }
+    if (_event->button != Button1) return;
+    if (is_dragging == true) return;
+
+    Window frame_window = find_frame_window(_event->window, _event->subwindow);
+    if(frame_window == 0) return;
+
+    start_dragging(display, frame_window, _event->x_root, _event->y_root);
 }
 
 HANDLE(ButtonRelease)
 {
     XButtonEvent *_event = &event->xbutton;
 
-    if (_event->button == Button1 && is_dragging == true)
-    {
-        stop_dragging();
-    }
+    if (_event->button != Button1) return;
+    if (is_dragging == false) return;
+
+    Window frame_window = find_frame_window(_event->window, _event->subwindow);
+    if(frame_window == 0) return;
+
+    stop_dragging();
 }
 
 HANDLE(MotionNotify)
 {
     XMotionEvent *_event = &event->xmotion;
 
-    if (is_dragging == true)
-    {
-        update_dragging(display, _event->x_root, _event->y_root);
-    }
+    if (is_dragging == false) return;
+
+    update_dragging(display, _event->x_root, _event->y_root);
 }

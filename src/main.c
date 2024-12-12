@@ -1,9 +1,5 @@
 #include "all.h"
 
-static const long root_event_mask =
-    SubstructureRedirectMask |
-    SubstructureNotifyMask;
-
 int main()
 {
     Display *display = XOpenDisplay(NULL);
@@ -14,10 +10,8 @@ int main()
     }
 
     XSetErrorHandler(error_handler);
-
-    Window root_window = DefaultRootWindow(display);
-    XSelectInput(display, root_window, root_event_mask);
     
+    Window root_window = DefaultRootWindow(display);
     initialize_atoms(display, root_window);
     initialize_event_loop(display, root_window);
     return 0;

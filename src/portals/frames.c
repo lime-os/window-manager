@@ -2,10 +2,12 @@
 
 static const long frame_event_mask =
     ExposureMask |
-    ButtonPressMask |
-    ButtonReleaseMask |
-    PointerMotionMask |
     SubstructureNotifyMask;
+
+static const long frame_grab_mask =
+    PointerMotionMask |
+    ButtonPressMask |
+    ButtonReleaseMask;
 
 static void draw_frame(Display *display, Window frame_window, unsigned int width, unsigned int height)
 {
@@ -39,8 +41,22 @@ Window create_frame(Display *display, Window root_window, int x, int y, unsigned
         x, y, width, height,
         2, 0x000000, 0xFFFFFF
     );
+
     XSelectInput(display, frame_window, frame_event_mask);
+    XGrabButton(display,
+        AnyButton,          // Grab all mouse buttons.
+        AnyModifier,        // Grab regardless of modifier keys.
+        frame_window,       // Window to grab events for.
+        True,               // Allow events to propagate.
+        frame_grab_mask,    // Event mask.
+        GrabModeAsync,      // Don't freeze pointer movement.
+        GrabModeAsync,      // Don't freeze keyboard input.
+        None,               // Don't confine the cursor.
+        None                // Don't change the cursor.
+    );
+
     draw_frame(display, frame_window, width, height);
+
     return frame_window;
 }
 
@@ -48,15 +64,13 @@ HANDLE(Expose)
 {
     XExposeEvent *_event = &event->xexpose;
 
-    if (_event->count == 0)
-    {
-        Window window = _event->window;
-        if (is_frame_window(window))
-        {
-            XWindowAttributes attr;
-            XGetWindowAttributes(display, window, &attr);
+    if (_event->count != 0) return;
+    
+    Window frame_window = find_frame_window(_event->window, 0);
+    if (frame_window == 0) return;
 
-            draw_frame(display, window, attr.width, attr.height);
-        }
-    }
+    XWindowAttributes attr;
+    XGetWindowAttributes(display, frame_window, &attr);
+
+    draw_frame(display, frame_window, attr.width, attr.height);
 }

@@ -1,5 +1,14 @@
 #include "../all.h"
 
+static const long client_event_mask =
+    ButtonPressMask |
+    ButtonReleaseMask;
+
+static void setup_client(Display *display, Window client_window)
+{
+    XSelectInput(display, client_window, client_event_mask);
+}
+
 static void handle_configure_request(Display *display, XConfigureRequestEvent *configure_request)
 {
     XWindowChanges changes;
@@ -29,6 +38,8 @@ HANDLE(MapRequest)
 {
     XMapRequestEvent *_event = &event->xmaprequest;
     Window client_window = _event->window;
+
+    setup_client(display, client_window);
 
     add_to_client_list_atom(display, root_window, client_window);
 }

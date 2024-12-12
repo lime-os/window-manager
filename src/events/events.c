@@ -3,13 +3,13 @@
 EventHandlerMap *event_handler_map = NULL;
 static int event_handler_map_size = 0;
 
-static const long event_mask =
+static const long root_event_mask =
     ExposureMask |
     KeyPressMask |
     SubstructureRedirectMask |
     SubstructureNotifyMask;
 
-static bool isRunning = false;
+static bool isInitialized = false;
 
 static void invoke_handlers(int event_type, XEvent *event, Display *display, Window window) {
     for(int i = 0; i < event_handler_map_size; i++) {
@@ -21,17 +21,18 @@ static void invoke_handlers(int event_type, XEvent *event, Display *display, Win
 
 void initialize_event_loop(Display *display, Window root_window)
 {
-    if (isRunning == true)
+    if (isInitialized == true)
     {
-        printf("Event loop has already been initialized\n");
+        // TODO Store in a log file.
+        printf("Attempted to initialize duplicate event loop.\n");
         return;
     }
 
     XEvent event;
-    isRunning = true;
+    isInitialized = true;
 
     // Choose which events the root window should listen to.
-    XSelectInput(display, root_window, event_mask);
+    XSelectInput(display, root_window, root_event_mask);
 
     // Invoke all preparation and initialization handler functions.
     invoke_handlers(Prepare, NULL, display, root_window);

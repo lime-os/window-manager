@@ -77,11 +77,12 @@ void destroy_portal(Display *display, Portal *portal)
     unregister_portal(portal);
 }
 
-Portal *find_portal_by_client_window(Window client_window)
+Portal *find_portal(Window window)
 {
     for (int i = 0; i < portals_count; i++)
     {
-        if (portals[i].client_window == client_window)
+        if (portals[i].frame_window == window ||
+            portals[i].client_window == window)
         {
             return &portals[i];
         }
@@ -89,56 +90,48 @@ Portal *find_portal_by_client_window(Window client_window)
     return NULL;
 }
 
-Portal *find_portal_by_frame_window(Window frame_window)
+Window find_frame_window(Window window, Window subwindow)
 {
-    for (int i = 0; i < portals_count; i++)
+    Window target_window = subwindow == 0 ? window : subwindow;
+    for(int i = 0; i < portals_count; i++)
     {
-        if (portals[i].frame_window == frame_window)
+        if(portals[i].frame_window == target_window)
         {
-            return &portals[i];
+            return target_window;
         }
     }
-    return NULL;
+    return 0;
 }
 
-bool is_frame_window(Window window)
+Window find_client_window(Window window, Window subwindow)
 {
-    return find_portal_by_frame_window(window) != NULL;
-}
-
-bool is_client_window(Window window)
-{
-    return find_portal_by_client_window(window) != NULL;
-}
-
-Window *find_frame_window(Window client_window)
-{
-    Portal *portal = find_portal_by_client_window(client_window);
-    return portal ? &portal->frame_window : NULL;
-}
-
-Window *find_client_window(Window frame_window)
-{
-    Portal *portal = find_portal_by_frame_window(frame_window);
-    return portal ? &portal->client_window : NULL;
+    Window target_window = subwindow == 0 ? window : subwindow;
+    for(int i = 0; i < portals_count; i++)
+    {
+        if(portals[i].client_window == target_window)
+        {
+            return target_window;
+        }
+    }
+    return 0;
 }
 
 HANDLE(MapRequest)
 {
     XMapRequestEvent *_event = &event->xmaprequest;
-    Window client_window = _event->window;
 
-    create_portal(display, root_window, client_window);
+    Portal *portal = find_portal(_event->window);
+    if(portal != NULL) return;
+
+    create_portal(display, root_window, _event->window);
 }
 
 HANDLE(DestroyNotify)
 {
     XDestroyWindowEvent *_event = &event->xdestroywindow;
-    Window client_window = _event->window;
 
-    Portal *portal = find_portal_by_client_window(client_window);
-    if (portal != NULL)
-    {
-        destroy_portal(display, portal);
-    }
+    Portal *portal = find_portal(_event->window);
+    if (portal == NULL) return;
+
+    destroy_portal(display, portal);
 }
