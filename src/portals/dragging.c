@@ -1,32 +1,35 @@
 #include "../all.h"
 
-Window dragged_window = 0;
-bool is_dragging = false;
-int drag_start_x = 0, drag_start_y = 0;
-int window_start_x = 0, window_start_y = 0;
+static Portal *dragged_portal = NULL;
+static bool is_dragging = false;
 
-static void start_dragging(Display *display, Window window, int mouse_x, int mouse_y)
+static int mouse_start_x = 0, mouse_start_y = 0;
+static int portal_start_x = 0, portal_start_y = 0;
+
+static void start_dragging(Portal *portal, int mouse_x, int mouse_y)
 {
-    XWindowAttributes attr;
-    if (!XGetWindowAttributes(display, window, &attr))
-    {
-        return;
-    }
-
     is_dragging = true;
-    dragged_window = window;
-    drag_start_x = mouse_x;
-    drag_start_y = mouse_y;
-    window_start_x = attr.x;
-    window_start_y = attr.y;
+    dragged_portal = portal;
+    portal_start_x = portal->x;
+    portal_start_y = portal->y;
+    mouse_start_x = mouse_x;
+    mouse_start_y = mouse_y;
 }
 
 static void update_dragging(Display *display, int mouse_x, int mouse_y)
 {
-    int dx = mouse_x - drag_start_x;
-    int dy = mouse_y - drag_start_y;
+    int new_portal_x = portal_start_x + (mouse_x - mouse_start_x);
+    int new_portal_y = portal_start_y + (mouse_y - mouse_start_y);
 
-    XMoveWindow(display, dragged_window, window_start_x + dx, window_start_y + dy);
+    dragged_portal->x = new_portal_x;
+    dragged_portal->y = new_portal_y;
+
+    XMoveWindow(
+        display,
+        dragged_portal->frame_window,
+        new_portal_x,
+        new_portal_y
+    );
 }
 
 static void stop_dragging()
@@ -40,11 +43,12 @@ HANDLE(ButtonPress)
 
     if (_event->button != Button1) return;
     if (is_dragging == true) return;
+    if (find_frame_window(_event->window, _event->subwindow) == 0) return;
 
-    Window frame_window = find_frame_window(_event->window, _event->subwindow);
-    if(frame_window == 0) return;
+    Portal *portal = find_portal(_event->window);
+    if(portal == NULL) return;
 
-    start_dragging(display, frame_window, _event->x_root, _event->y_root);
+    start_dragging(portal, _event->x_root, _event->y_root);
 }
 
 HANDLE(ButtonRelease)
@@ -53,9 +57,6 @@ HANDLE(ButtonRelease)
 
     if (_event->button != Button1) return;
     if (is_dragging == false) return;
-
-    Window frame_window = find_frame_window(_event->window, _event->subwindow);
-    if(frame_window == 0) return;
 
     stop_dragging();
 }

@@ -3,7 +3,7 @@
 Portal *portals = NULL;
 int portals_count = 0;
 
-static void register_portal(Window frame_window, Window client_window)
+static void register_portal(Window frame_window, Window client_window, int x, int y)
 {
     Portal *buffer = realloc(portals, (portals_count + 1) * sizeof(Portal));
     if (buffer == NULL)
@@ -16,6 +16,8 @@ static void register_portal(Window frame_window, Window client_window)
     portals = buffer;
     portals[portals_count].frame_window = frame_window;
     portals[portals_count].client_window = client_window;
+    portals[portals_count].x = x;
+    portals[portals_count].y = y;
     portals_count++;
 }
 
@@ -68,7 +70,7 @@ void create_portal(Display *display, Window root_window, Window client_window)
     XMapWindow(display, frame_window);
     XMapWindow(display, client_window);
 
-    register_portal(frame_window, client_window);
+    register_portal(frame_window, client_window, attr.x, attr.y);
 }
 
 void destroy_portal(Display *display, Portal *portal)
