@@ -103,3 +103,29 @@ int expand_path(const char *path, char *expanded_path, size_t size)
 
     return 0;
 }
+
+/**
+ * Returns the smaller of two integers.
+ *
+ * @param a First integer to compare.
+ * @param b Second integer to compare.
+ *
+ * @return The smaller of a and b.
+ */
+int min(int a, int b)
+{
+    return (a < b) ? a : b;
+}
+
+/**
+ * Returns the larger of two integers.
+ *
+ * @param a First integer to compare.
+ * @param b Second integer to compare.
+ *
+ * @return The larger of a and b.
+ */
+int max(int a, int b)
+{
+    return (a > b) ? a : b;
+}

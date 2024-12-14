@@ -12,6 +12,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <time.h>
 
 #include "limits.h"
 #include "geometry.h"
@@ -29,3 +30,4 @@
 #include "portals/buttons.h"
 #include "portals/frames.h"
 #include "portals/clients.h"
+#include "portals/resizing.h"

@@ -2,9 +2,10 @@
 #include "../all.h"
 
 typedef struct {
+    int x, y;
+    unsigned int width, height;
     Window frame_window;
     Window client_window;
-    int x, y;
 } Portal;
 
 void create_portal(Display *display, Window root_window, Window client_window);
