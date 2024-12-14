@@ -6,6 +6,8 @@ static bool is_dragging = false;
 static int mouse_start_x = 0, mouse_start_y = 0;
 static int portal_start_x = 0, portal_start_y = 0;
 
+static Time last_drag_time = 0;
+
 static void start_dragging(Portal *portal, int mouse_x, int mouse_y)
 {
     is_dragging = true;
@@ -16,8 +18,10 @@ static void start_dragging(Portal *portal, int mouse_x, int mouse_y)
     mouse_start_y = mouse_y;
 }
 
-static void update_dragging(Display *display, int mouse_x, int mouse_y)
+static void update_dragging(Display *display, int mouse_x, int mouse_y, Time event_time)
 {
+    if (event_time - last_drag_time < RESIZE_THROTTLE_MS) return;
+
     int new_portal_x = portal_start_x + (mouse_x - mouse_start_x);
     int new_portal_y = portal_start_y + (mouse_y - mouse_start_y);
 
@@ -30,6 +34,8 @@ static void update_dragging(Display *display, int mouse_x, int mouse_y)
         new_portal_x,
         new_portal_y
     );
+
+    last_drag_time = event_time;
 }
 
 static void stop_dragging()
@@ -67,5 +73,5 @@ HANDLE(MotionNotify)
 
     if (is_dragging == false) return;
 
-    update_dragging(display, _event->x_root, _event->y_root);
+    update_dragging(display, _event->x_root, _event->y_root, _event->time);
 }
