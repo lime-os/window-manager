@@ -52,7 +52,7 @@ static bool is_resize_area(Portal *portal, int mouse_x, int mouse_y)
     
     return (relative_mouse_x >= (int)portal->width - RESIZE_AREA_SIZE && 
             relative_mouse_x <= (int)portal->width &&
-            relative_mouse_x >= (int)portal->height - RESIZE_AREA_SIZE && 
+            relative_mouse_y >= (int)portal->height - RESIZE_AREA_SIZE && 
             relative_mouse_y <= (int)portal->height);
 }
 
