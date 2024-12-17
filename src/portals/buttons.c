@@ -87,21 +87,22 @@ void draw_button(cairo_t *cr, unsigned int frame_width, ButtonType type)
     cairo_stroke(cr);
 }
 
-HANDLE(ButtonPress)
+HANDLE(GlobalButtonPress)
 {
     XButtonEvent *_event = &event->xbutton;
 
     if (_event->button != Button1) return;
-    
-    Window frame_window = find_frame_window(_event->window, _event->subwindow);
-    if(frame_window == 0) return;
+    if(is_frame_area(_event->x, _event->y) == false) return;
+
+    Portal *portal = find_portal(_event->window);
+    if(portal == NULL) return;
 
     XWindowAttributes attr;
-    XGetWindowAttributes(display, frame_window, &attr);
+    XGetWindowAttributes(display, portal->frame_window, &attr);
     unsigned int frame_width = attr.width;
 
     if(is_button_hit(_event->x, _event->y, frame_width, BUTTON_CLOSE))
     {
-        handle_close_button_click(display, frame_window);
+        handle_close_button_click(display, portal->frame_window);
     }
 }

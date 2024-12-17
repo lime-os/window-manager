@@ -25,7 +25,8 @@ sudo apt install \
     gcc \
     make \
     libx11-dev \
-    libcairo2-dev 
+    libxi-dev \
+    libcairo2-dev
 ```
 
 Once the dependencies are installed, you can build the project by running:

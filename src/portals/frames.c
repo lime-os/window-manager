@@ -4,11 +4,6 @@ static const long frame_event_mask =
     ExposureMask |
     SubstructureNotifyMask;
 
-static const long frame_grab_mask =
-    PointerMotionMask |
-    ButtonPressMask |
-    ButtonReleaseMask;
-
 static void draw_frame(Display *display, Window frame_window, unsigned int width, unsigned int height)
 {
     cairo_surface_t *surface;
@@ -43,17 +38,6 @@ Window create_frame(Display *display, Window root_window, int x, int y, unsigned
     );
 
     XSelectInput(display, frame_window, frame_event_mask);
-    XGrabButton(display,
-        AnyButton,          // Grab all mouse buttons.
-        AnyModifier,        // Grab regardless of modifier keys.
-        frame_window,       // Window to grab events for.
-        True,               // Allow events to propagate.
-        frame_grab_mask,    // Event mask.
-        GrabModeAsync,      // Don't freeze pointer movement.
-        GrabModeAsync,      // Don't freeze keyboard input.
-        None,               // Don't confine the cursor.
-        None                // Don't change the cursor.
-    );
 
     draw_frame(display, frame_window, width, height);
 
@@ -65,12 +49,13 @@ HANDLE(Expose)
     XExposeEvent *_event = &event->xexpose;
 
     if (_event->count != 0) return;
-    
-    Window frame_window = find_frame_window(_event->window, 0);
-    if (frame_window == 0) return;
+    if (is_frame_window(_event->window) == false) return;
+
+    Portal *portal = find_portal(_event->window);
+    if (portal == NULL) return;
 
     XWindowAttributes attr;
-    XGetWindowAttributes(display, frame_window, &attr);
+    XGetWindowAttributes(display, portal->frame_window, &attr);
 
-    draw_frame(display, frame_window, attr.width, attr.height);
+    draw_frame(display, portal->frame_window, attr.width, attr.height);
 }

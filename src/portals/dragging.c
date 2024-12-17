@@ -43,13 +43,13 @@ static void stop_dragging()
     is_dragging = false;
 }
 
-HANDLE(ButtonPress)
+HANDLE(GlobalButtonPress)
 {
     XButtonEvent *_event = &event->xbutton;
 
     if (_event->button != Button1) return;
     if (is_dragging == true) return;
-    if (find_frame_window(_event->window, _event->subwindow) == 0) return;
+    if (is_frame_area(_event->x, _event->y) == false) return;
 
     Portal *portal = find_portal(_event->window);
     if(portal == NULL) return;
@@ -57,7 +57,7 @@ HANDLE(ButtonPress)
     start_dragging(portal, _event->x_root, _event->y_root);
 }
 
-HANDLE(ButtonRelease)
+HANDLE(GlobalButtonRelease)
 {
     XButtonEvent *_event = &event->xbutton;
 
@@ -67,7 +67,7 @@ HANDLE(ButtonRelease)
     stop_dragging();
 }
 
-HANDLE(MotionNotify)
+HANDLE(GlobalMotionNotify)
 {
     XMotionEvent *_event = &event->xmotion;
 

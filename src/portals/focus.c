@@ -1,28 +1,17 @@
 #include "../all.h"
 
-static void focus_window(Display *display, Window window, Window subwindow) {
-    Window client_window = find_client_window(window, subwindow);
-    if (client_window != 0) {
-        Portal *portal = find_portal(client_window);
-        if(portal != NULL)
-        {
-            XRaiseWindow(display, portal->frame_window);
-        }
-        return;
-    }
-
-    Window frame_window = find_frame_window(window, subwindow);
-    if (frame_window != 0) {
-        XRaiseWindow(display, frame_window);
-        return;
-    }
+static void focus_portal(Display *display, Portal *portal) {
+    XRaiseWindow(display, portal->frame_window);
 }
 
-HANDLE(ButtonPress)
+HANDLE(GlobalButtonPress)
 {
     XButtonEvent *_event = &event->xbutton;
 
     if (_event->button != Button1) return;
+
+    Portal *portal = find_portal(_event->window);
+    if(portal == NULL) return;
     
-    focus_window(display, _event->window, _event->subwindow);
+    focus_portal(display, portal);
 }

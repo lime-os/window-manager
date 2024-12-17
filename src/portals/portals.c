@@ -26,15 +26,15 @@ static void register_portal(Window frame_window, Window client_window, int x, in
 static void unregister_portal(Portal *portal)
 {
     int index = -1;
-    for (int i = 0; i < portals_count; i++) {
-        if (&portals[i] == portal) {
+    for (int i = 0; i < portals_count; i++)
+    {
+        if (&portals[i] == portal)
+        {
             index = i;
             break;
         }
     }
-    if (index == -1) {
-        return;
-    }
+    if (index == -1) return;
 
     // Shift all elements after the found index to the left.
     for (int i = index; i < portals_count - 1; i++)
@@ -94,30 +94,40 @@ Portal *find_portal(Window window)
     return NULL;
 }
 
-Window find_frame_window(Window window, Window subwindow)
+bool is_frame_area(int x, int y)
 {
-    Window target_window = subwindow == 0 ? window : subwindow;
-    for(int i = 0; i < portals_count; i++)
-    {
-        if(portals[i].frame_window == target_window)
-        {
-            return target_window;
-        }
-    }
-    return 0;
+    (void)x;
+    return y <= TITLE_BAR_HEIGHT;
 }
 
-Window find_client_window(Window window, Window subwindow)
+bool is_client_area(int x, int y)
 {
-    Window target_window = subwindow == 0 ? window : subwindow;
-    for(int i = 0; i < portals_count; i++)
+    (void)x;
+    return y > TITLE_BAR_HEIGHT;
+}
+
+bool is_frame_window(Window window)
+{
+    for (int i = 0; i < portals_count; i++)
     {
-        if(portals[i].client_window == target_window)
+        if (portals[i].frame_window == window)
         {
-            return target_window;
+            return true;
         }
     }
-    return 0;
+    return false;
+}
+
+bool is_client_window(Window window)
+{
+    for (int i = 0; i < portals_count; i++)
+    {
+        if (portals[i].client_window == window)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 HANDLE(MapRequest)
@@ -129,7 +139,7 @@ HANDLE(MapRequest)
     Window client_window = _event->window;
 
     Portal *portal = find_portal(_event->window);
-    if(portal != NULL) return;
+    if (portal != NULL) return;
 
     create_portal(display, root_window, client_window);
 }

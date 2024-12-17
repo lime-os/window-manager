@@ -56,7 +56,7 @@ static bool is_resize_area(Portal *portal, int mouse_x, int mouse_y)
             relative_mouse_y <= (int)portal->height);
 }
 
-HANDLE(ButtonPress)
+HANDLE(GlobalButtonPress)
 {
     XButtonEvent *_event = &event->xbutton;
 
@@ -71,7 +71,7 @@ HANDLE(ButtonPress)
     start_resizing(portal, _event->x_root, _event->y_root);
 }
 
-HANDLE(ButtonRelease)
+HANDLE(GlobalButtonRelease)
 {
     XButtonEvent *_event = &event->xbutton;
 
@@ -81,7 +81,7 @@ HANDLE(ButtonRelease)
     stop_resizing();
 }
 
-HANDLE(MotionNotify)
+HANDLE(GlobalMotionNotify)
 {
     XMotionEvent *_event = &event->xmotion;
 
