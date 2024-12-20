@@ -92,10 +92,11 @@ HANDLE(GlobalButtonPress)
     XButtonEvent *_event = &event->xbutton;
 
     if (_event->button != Button1) return;
-    if(is_frame_area(_event->x, _event->y) == false) return;
 
     Portal *portal = find_portal(_event->window);
     if(portal == NULL) return;
+
+    if(is_portal_frame_area(portal, _event->x, _event->y) == false) return;
 
     XWindowAttributes attr;
     XGetWindowAttributes(display, portal->frame_window, &attr);

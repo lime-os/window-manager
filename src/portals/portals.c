@@ -3,13 +3,11 @@
 Portal *portals = NULL;
 int portals_count = 0;
 
-static void register_portal(
+static Portal *register_portal(
     Display *display,
-    Window frame_window,
-    Window client_window,
+    Window frame_window, Window client_window,
     int x, int y,
-    unsigned int width,
-    unsigned int height
+    unsigned int width, unsigned int height
 )
 {
     Portal *buffer = realloc(portals, (portals_count + 1) * sizeof(Portal));
@@ -29,6 +27,8 @@ static void register_portal(
     portals[portals_count].width = width;
     portals[portals_count].height = height;
     portals_count++;
+
+    return &portals[portals_count - 1];
 }
 
 static void unregister_portal(Portal *portal)
@@ -69,42 +69,43 @@ static void unregister_portal(Portal *portal)
     portals = buffer;
 }
 
-void create_portal(Display *display, Window client_window)
+Portal *create_portal(Display *display, Window client_window)
 {
     XWindowAttributes client_attr;
     if(XGetWindowAttributes(display, client_window, &client_attr) == 0)
     {
         // TODO Log error in file.
         perror("Failed to get client window attributes while creating portal\n");
-        return;
+        return NULL;
     }
 
+    // Calculate the portal dimensions.
     int portal_x = client_attr.x;
     int portal_y = client_attr.y;
     unsigned int portal_width = client_attr.width;
     unsigned int portal_height = client_attr.height + TITLE_BAR_HEIGHT;
 
-    Window frame_window = create_frame(
-        display, DefaultRootWindow(display),
+    // Register the portal and create the frame window.
+    Portal *portal = register_portal(display,
+        0, client_window,
         portal_x, portal_y,
         portal_width, portal_height
     );
+    Window frame_window = create_frame(portal);
+    portal->frame_window = frame_window;
 
+    // Reparent the client window to the frame window and map both windows.
     XAddToSaveSet(display, client_window);
     XReparentWindow(display, client_window, frame_window, 0, TITLE_BAR_HEIGHT);
     XMapWindow(display, frame_window);
     XMapWindow(display, client_window);
 
-    register_portal(display,
-        frame_window, client_window,
-        portal_x, portal_y,
-        portal_width, portal_height
-    );
+    return portal;
 }
 
 void destroy_portal(Portal *portal)
 {
-    XDestroyWindow(portal->display, portal->frame_window);
+    destroy_frame(portal);
     unregister_portal(portal);
 }
 
@@ -121,40 +122,16 @@ Portal *find_portal(Window window)
     return NULL;
 }
 
-bool is_frame_area(int rel_x, int rel_y)
+bool is_portal_frame_area(Portal *portal, int rel_x, int rel_y)
 {
-    (void)rel_x;
+    (void)portal, (void)rel_x;
     return rel_y <= TITLE_BAR_HEIGHT;
 }
 
-bool is_client_area(int rel_x, int rel_y)
+bool is_portal_client_area(Portal *portal, int rel_x, int rel_y)
 {
-    (void)rel_x;
+    (void)portal, (void)rel_x;
     return rel_y > TITLE_BAR_HEIGHT;
-}
-
-bool is_frame_window(Window window)
-{
-    for (int i = 0; i < portals_count; i++)
-    {
-        if (portals[i].frame_window == window)
-        {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool is_client_window(Window window)
-{
-    for (int i = 0; i < portals_count; i++)
-    {
-        if (portals[i].client_window == window)
-        {
-            return true;
-        }
-    }
-    return false;
 }
 
 HANDLE(MapRequest)
