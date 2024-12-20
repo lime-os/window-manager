@@ -18,24 +18,35 @@ static void start_resizing(Portal *portal, int mouse_root_x, int mouse_root_y)
     mouse_start_root_y = mouse_root_y;
 }
 
-static void update_resizing(Display *display, int mouse_root_x, int mouse_root_y, Time event_time)
+static void update_resizing(int mouse_root_x, int mouse_root_y, Time event_time)
 {
     if (event_time - last_resize_time < RESIZE_THROTTLE_MS) return;
 
+    // Calculate new portal width and height.
     int new_portal_width = max(
-        MINIMUM_WINDOW_WIDTH,
+        MINIMUM_PORTAL_WIDTH,
         portal_start_width + (mouse_root_x - mouse_start_root_x)
     );
     int new_portal_height = max(
-        MINIMUM_WINDOW_HEIGHT,
+        MINIMUM_PORTAL_HEIGHT,
         portal_start_height + (mouse_root_y - mouse_start_root_y)
     );
 
+    // Update portal struct with new width and height.
     resized_portal->width = new_portal_width;
     resized_portal->height = new_portal_height;
 
-    XResizeWindow(display, resized_portal->frame_window, new_portal_width, new_portal_height);
-    XResizeWindow(display, resized_portal->client_window, new_portal_width, new_portal_height - TITLE_BAR_HEIGHT);
+    // Resize the frame and client windows.
+    XResizeWindow(
+        resized_portal->display,
+        resized_portal->frame_window,
+        new_portal_width, new_portal_height
+    );
+    XResizeWindow(
+        resized_portal->display,
+        resized_portal->client_window,
+        new_portal_width, new_portal_height - TITLE_BAR_HEIGHT
+    );
 
     last_resize_time = event_time;
 }
@@ -46,7 +57,7 @@ static void stop_resizing()
 }
 
 static bool is_resize_area(Portal *portal, int mouse_rel_x, int mouse_rel_y)
-{    
+{
     return (mouse_rel_x >= (int)portal->width - RESIZE_AREA_SIZE && 
             mouse_rel_x <= (int)portal->width &&
             mouse_rel_y >= (int)portal->height - RESIZE_AREA_SIZE && 
@@ -84,5 +95,5 @@ HANDLE(GlobalMotionNotify)
 
     if (is_resizing == false) return;
 
-    update_resizing(display, _event->x_root, _event->y_root, _event->time);
+    update_resizing(_event->x_root, _event->y_root, _event->time);
 }
