@@ -33,11 +33,11 @@ static bool is_button_hit(int mouse_rel_x, int mouse_rel_y, unsigned int frame_w
             mouse_rel_y <= button_pos.y + BUTTON_SIZE);
 }
 
-static void handle_close_button_click(Display *display, Window frame_window) {
+static void handle_close_button_click(Window frame_window) {
     Portal *portal = find_portal(frame_window);
     if(portal != NULL)
     {
-        destroy_portal(display, portal);
+        destroy_portal(portal);
     }
 }
 
@@ -103,6 +103,6 @@ HANDLE(GlobalButtonPress)
 
     if(is_button_hit(_event->x, _event->y, frame_width, BUTTON_CLOSE))
     {
-        handle_close_button_click(display, portal->frame_window);
+        handle_close_button_click(portal->frame_window);
     }
 }

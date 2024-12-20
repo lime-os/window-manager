@@ -3,7 +3,14 @@
 Portal *portals = NULL;
 int portals_count = 0;
 
-static void register_portal(Window frame_window, Window client_window, int x, int y, unsigned int width, unsigned int height)
+static void register_portal(
+    Display *display,
+    Window frame_window,
+    Window client_window,
+    int x, int y,
+    unsigned int width,
+    unsigned int height
+)
 {
     Portal *buffer = realloc(portals, (portals_count + 1) * sizeof(Portal));
     if (buffer == NULL)
@@ -14,6 +21,7 @@ static void register_portal(Window frame_window, Window client_window, int x, in
     }
 
     portals = buffer;
+    portals[portals_count].display = display;
     portals[portals_count].frame_window = frame_window;
     portals[portals_count].client_window = client_window;
     portals[portals_count].x = x;
@@ -25,6 +33,7 @@ static void register_portal(Window frame_window, Window client_window, int x, in
 
 static void unregister_portal(Portal *portal)
 {
+    // Find the index of the portal in the array.
     int index = -1;
     for (int i = 0; i < portals_count; i++)
     {
@@ -34,7 +43,12 @@ static void unregister_portal(Portal *portal)
             break;
         }
     }
-    if (index == -1) return;
+    if (index == -1)
+    {
+        // TODO Log error in file.
+        perror("Failed to find portal in registry while unregistering portal\n");
+        return;
+    }
 
     // Shift all elements after the found index to the left.
     for (int i = index; i < portals_count - 1; i++)
@@ -52,19 +66,28 @@ static void unregister_portal(Portal *portal)
         perror("Failed to allocate memory while unregistering from portal registry\n");
         exit(EXIT_FAILURE);
     }
-
     portals = buffer;
 }
 
-void create_portal(Display *display, Window root_window, Window client_window)
+void create_portal(Display *display, Window client_window)
 {
-    XWindowAttributes attr;
-    XGetWindowAttributes(display, client_window, &attr);
+    XWindowAttributes client_attr;
+    if(XGetWindowAttributes(display, client_window, &client_attr) == 0)
+    {
+        // TODO Log error in file.
+        perror("Failed to get client window attributes while creating portal\n");
+        return;
+    }
+
+    int portal_x = client_attr.x;
+    int portal_y = client_attr.y;
+    unsigned int portal_width = client_attr.width;
+    unsigned int portal_height = client_attr.height + TITLE_BAR_HEIGHT;
 
     Window frame_window = create_frame(
-        display, root_window,
-        attr.x, attr.y,
-        attr.width, attr.height
+        display, DefaultRootWindow(display),
+        portal_x, portal_y,
+        portal_width, portal_height
     );
 
     XAddToSaveSet(display, client_window);
@@ -72,12 +95,16 @@ void create_portal(Display *display, Window root_window, Window client_window)
     XMapWindow(display, frame_window);
     XMapWindow(display, client_window);
 
-    register_portal(frame_window, client_window, attr.x, attr.y, attr.width, attr.height);
+    register_portal(display,
+        frame_window, client_window,
+        portal_x, portal_y,
+        portal_width, portal_height
+    );
 }
 
-void destroy_portal(Display *display, Portal *portal)
+void destroy_portal(Portal *portal)
 {
-    XDestroyWindow(display, portal->frame_window);
+    XDestroyWindow(portal->display, portal->frame_window);
     unregister_portal(portal);
 }
 
@@ -94,16 +121,16 @@ Portal *find_portal(Window window)
     return NULL;
 }
 
-bool is_frame_area(int mouse_rel_x, int mouse_rel_y)
+bool is_frame_area(int rel_x, int rel_y)
 {
-    (void)mouse_rel_x;
-    return mouse_rel_y <= TITLE_BAR_HEIGHT;
+    (void)rel_x;
+    return rel_y <= TITLE_BAR_HEIGHT;
 }
 
-bool is_client_area(int mouse_rel_x, int mouse_rel_y)
+bool is_client_area(int rel_x, int rel_y)
 {
-    (void)mouse_rel_x;
-    return mouse_rel_y > TITLE_BAR_HEIGHT;
+    (void)rel_x;
+    return rel_y > TITLE_BAR_HEIGHT;
 }
 
 bool is_frame_window(Window window)
@@ -138,10 +165,10 @@ HANDLE(MapRequest)
     // safely assume that the window is a client window.
     Window client_window = _event->window;
 
-    Portal *portal = find_portal(_event->window);
+    Portal *portal = find_portal(client_window);
     if (portal != NULL) return;
 
-    create_portal(display, root_window, client_window);
+    create_portal(display, client_window);
 }
 
 HANDLE(DestroyNotify)
@@ -155,5 +182,5 @@ HANDLE(DestroyNotify)
     Portal *portal = find_portal(client_window);
     if (portal == NULL) return;
 
-    destroy_portal(display, portal);
+    destroy_portal(portal);
 }
