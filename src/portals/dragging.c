@@ -18,7 +18,7 @@ static void start_dragging(Portal *portal, int mouse_root_x, int mouse_root_y)
     mouse_start_root_y = mouse_root_y;
 }
 
-static void update_dragging(Display *display, int mouse_root_x, int mouse_root_y, Time event_time)
+static void update_dragging(int mouse_root_x, int mouse_root_y, Time event_time)
 {
     if (event_time - last_drag_time < RESIZE_THROTTLE_MS) return;
 
@@ -29,7 +29,7 @@ static void update_dragging(Display *display, int mouse_root_x, int mouse_root_y
     dragged_portal->y = new_portal_y;
 
     XMoveWindow(
-        display,
+        dragged_portal->display,
         dragged_portal->frame_window,
         new_portal_x,
         new_portal_y
@@ -74,5 +74,5 @@ HANDLE(GlobalMotionNotify)
 
     if (is_dragging == false) return;
 
-    update_dragging(display, _event->x_root, _event->y_root, _event->time);
+    update_dragging(_event->x_root, _event->y_root, _event->time);
 }
