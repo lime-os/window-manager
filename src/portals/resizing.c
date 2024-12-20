@@ -3,32 +3,32 @@
 static Portal *resized_portal = NULL;
 static bool is_resizing = false;
 
-static int mouse_start_x = 0, mouse_start_y = 0;
+static int mouse_start_root_x = 0, mouse_start_root_y = 0;
 static int portal_start_width = 0, portal_start_height = 0;
 
 static Time last_resize_time = 0;
 
-static void start_resizing(Portal *portal, int mouse_x, int mouse_y)
+static void start_resizing(Portal *portal, int mouse_root_x, int mouse_root_y)
 {
     is_resizing = true;
     resized_portal = portal;
     portal_start_width = portal->width;
     portal_start_height = portal->height;
-    mouse_start_x = mouse_x;
-    mouse_start_y = mouse_y;
+    mouse_start_root_x = mouse_root_x;
+    mouse_start_root_y = mouse_root_y;
 }
 
-static void update_resizing(Display *display, int mouse_x, int mouse_y, Time event_time)
+static void update_resizing(Display *display, int mouse_root_x, int mouse_root_y, Time event_time)
 {
     if (event_time - last_resize_time < RESIZE_THROTTLE_MS) return;
 
     int new_portal_width = max(
         MINIMUM_WINDOW_WIDTH,
-        portal_start_width + (mouse_x - mouse_start_x)
+        portal_start_width + (mouse_root_x - mouse_start_root_x)
     );
     int new_portal_height = max(
         MINIMUM_WINDOW_HEIGHT,
-        portal_start_height + (mouse_y - mouse_start_y)
+        portal_start_height + (mouse_root_y - mouse_start_root_y)
     );
 
     resized_portal->width = new_portal_width;
@@ -45,15 +45,12 @@ static void stop_resizing()
     is_resizing = false;
 }
 
-static bool is_resize_area(Portal *portal, int mouse_x, int mouse_y)
-{
-    int relative_mouse_x = mouse_x - portal->x;
-    int relative_mouse_y = mouse_y - portal->y;
-    
-    return (relative_mouse_x >= (int)portal->width - RESIZE_AREA_SIZE && 
-            relative_mouse_x <= (int)portal->width &&
-            relative_mouse_y >= (int)portal->height - RESIZE_AREA_SIZE && 
-            relative_mouse_y <= (int)portal->height);
+static bool is_resize_area(Portal *portal, int mouse_rel_x, int mouse_rel_y)
+{    
+    return (mouse_rel_x >= (int)portal->width - RESIZE_AREA_SIZE && 
+            mouse_rel_x <= (int)portal->width &&
+            mouse_rel_y >= (int)portal->height - RESIZE_AREA_SIZE && 
+            mouse_rel_y <= (int)portal->height);
 }
 
 HANDLE(GlobalButtonPress)
@@ -66,7 +63,7 @@ HANDLE(GlobalButtonPress)
     Portal *portal = find_portal(_event->window);
     if(portal == NULL) return;
 
-    if(!is_resize_area(portal, _event->x_root, _event->y_root)) return;
+    if(!is_resize_area(portal, _event->x, _event->y)) return;
 
     start_resizing(portal, _event->x_root, _event->y_root);
 }

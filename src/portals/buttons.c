@@ -25,12 +25,12 @@ static Vector2 calculate_button_position(unsigned int frame_width, ButtonType ty
     return pos;
 }
 
-static bool is_button_hit(int x, int y, unsigned int frame_width, ButtonType type) {
+static bool is_button_hit(int mouse_rel_x, int mouse_rel_y, unsigned int frame_width, ButtonType type) {
     Vector2 button_pos = calculate_button_position(frame_width, type);
-    return (x >= button_pos.x && 
-            x <= button_pos.x + BUTTON_SIZE &&
-            y >= button_pos.y && 
-            y <= button_pos.y + BUTTON_SIZE);
+    return (mouse_rel_x >= button_pos.x && 
+            mouse_rel_x <= button_pos.x + BUTTON_SIZE &&
+            mouse_rel_y >= button_pos.y && 
+            mouse_rel_y <= button_pos.y + BUTTON_SIZE);
 }
 
 static void handle_close_button_click(Display *display, Window frame_window) {

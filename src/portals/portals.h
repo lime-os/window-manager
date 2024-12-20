@@ -12,7 +12,7 @@ void create_portal(Display *display, Window root_window, Window client_window);
 void destroy_portal(Display *display, Portal *portal);
 Portal *find_portal(Window window);
 
-bool is_frame_area(int x, int y);
-bool is_client_area(int x, int y);
+bool is_frame_area(int mouse_rel_x, int mouse_rel_y);
+bool is_client_area(int mouse_rel_x, int mouse_rel_y);
 bool is_frame_window(Window window);
 bool is_client_window(Window window);

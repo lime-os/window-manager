@@ -94,16 +94,16 @@ Portal *find_portal(Window window)
     return NULL;
 }
 
-bool is_frame_area(int x, int y)
+bool is_frame_area(int mouse_rel_x, int mouse_rel_y)
 {
-    (void)x;
-    return y <= TITLE_BAR_HEIGHT;
+    (void)mouse_rel_x;
+    return mouse_rel_y <= TITLE_BAR_HEIGHT;
 }
 
-bool is_client_area(int x, int y)
+bool is_client_area(int mouse_rel_x, int mouse_rel_y)
 {
-    (void)x;
-    return y > TITLE_BAR_HEIGHT;
+    (void)mouse_rel_x;
+    return mouse_rel_y > TITLE_BAR_HEIGHT;
 }
 
 bool is_frame_window(Window window)
