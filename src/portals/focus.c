@@ -1,7 +1,7 @@
 #include "../all.h"
 
-static void focus_portal(Display *display, Portal *portal) {
-    XRaiseWindow(display, portal->frame_window);
+static void focus_portal(Portal *portal) {
+    XRaiseWindow(portal->display, portal->frame_window);
 }
 
 HANDLE(GlobalButtonPress)
@@ -13,5 +13,5 @@ HANDLE(GlobalButtonPress)
     Portal *portal = find_portal(_event->window);
     if(portal == NULL) return;
     
-    focus_portal(display, portal);
+    focus_portal(portal);
 }
