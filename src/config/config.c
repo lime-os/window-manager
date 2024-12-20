@@ -32,7 +32,7 @@ static void create_config_directory(const char *path)
     for (size_t i = 1; i <= path_length; ++i)
     {
         // Copy the portion of the path up to the current character.
-        strncpy(buffer, path, i);
+        memcpy(buffer, path, i);
         buffer[i] = '\0';
 
         // If we encounter a slash or the end of the path, it means we've
