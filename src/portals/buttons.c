@@ -1,90 +1,78 @@
 #include "../all.h"
 
-static Vector2 calculate_button_position(unsigned int frame_width, ButtonType type) {
-    Vector2 pos;
-    
+static void calculate_button_position(Portal *portal, ButtonType type, int *out_x, int *out_y)
+{
     // Calculate starting position.
-    pos.x = frame_width - BUTTON_PADDING - BUTTON_SIZE;
-    pos.y = (TITLE_BAR_HEIGHT - BUTTON_SIZE) / 2;
+    int x = portal->width - BUTTON_PADDING - BUTTON_SIZE;
+    int y = (TITLE_BAR_HEIGHT - BUTTON_SIZE) / 2;
     
     // Calculate the position based on the button type.
-    switch (type) {
-        case BUTTON_CLOSE:
-            pos.x = pos.x;
-            break;
-        case BUTTON_MAXIMIZE:
-            pos.x -= (BUTTON_SIZE + BUTTON_PADDING);
-            break;
-        case BUTTON_MINIMIZE:
-            pos.x -= 2 * (BUTTON_SIZE + BUTTON_PADDING);
-            break;
-        default:
-            break;
-    }
-    
-    return pos;
-}
-
-static bool is_button_hit(int mouse_rel_x, int mouse_rel_y, unsigned int frame_width, ButtonType type) {
-    Vector2 button_pos = calculate_button_position(frame_width, type);
-    return (mouse_rel_x >= button_pos.x && 
-            mouse_rel_x <= button_pos.x + BUTTON_SIZE &&
-            mouse_rel_y >= button_pos.y && 
-            mouse_rel_y <= button_pos.y + BUTTON_SIZE);
-}
-
-static void handle_close_button_click(Window frame_window) {
-    Portal *portal = find_portal(frame_window);
-    if(portal != NULL)
+    if(type == BUTTON_CLOSE)
     {
-        destroy_portal(portal);
+        *out_x = x;
+        *out_y = y;
+    }
+    if(type == BUTTON_ARRANGE)
+    {
+        *out_x = x - BUTTON_SIZE - BUTTON_PADDING;
+        *out_y = y;
     }
 }
 
-void draw_button(cairo_t *cr, unsigned int frame_width, ButtonType type)
-{
-    Vector2 pos = calculate_button_position(frame_width, type);
-    int x = pos.x;
-    int y = pos.y;
+static bool is_button_area(Portal *portal, ButtonType type, int mouse_rel_x, int mouse_rel_y) {
+    int button_x, button_y;
+    calculate_button_position(portal, type, &button_x, &button_y);
 
+    return (mouse_rel_x >= button_x && 
+            mouse_rel_x <= button_x + BUTTON_SIZE &&
+            mouse_rel_y >= button_y && 
+            mouse_rel_y <= button_y + BUTTON_SIZE);
+}
+
+static void draw_button(Portal *portal, ButtonType type)
+{
+    cairo_t *cr = portal->frame_cr;
+
+    int button_x, button_y;
+    calculate_button_position(portal, type, &button_x, &button_y);
+
+    // Define the button stroke style.
     cairo_set_source_rgb(cr, 1, 1, 1);
     cairo_set_line_width(cr, 2);
 
-    switch (type)
+    // Define the button path based on the button type.
+    if (type == BUTTON_CLOSE)
     {
-        case BUTTON_CLOSE:
-            cairo_move_to(cr,
-                x + BUTTON_PADDING,
-                y + BUTTON_PADDING);
-            cairo_line_to(cr,
-                x + BUTTON_SIZE - BUTTON_PADDING, 
-                y + BUTTON_SIZE - BUTTON_PADDING);
-            cairo_move_to(cr,
-                x + BUTTON_SIZE - BUTTON_PADDING, 
-                y + BUTTON_PADDING);
-            cairo_line_to(cr,
-                x + BUTTON_PADDING, 
-                y + BUTTON_SIZE - BUTTON_PADDING);
-            break;
-        case BUTTON_MAXIMIZE:
-            cairo_rectangle(cr,
-                x + BUTTON_PADDING, 
-                y + BUTTON_PADDING,
-                BUTTON_SIZE - (2 * BUTTON_PADDING),
-                BUTTON_SIZE - (2 * BUTTON_PADDING));
-            break;
-        case BUTTON_MINIMIZE:
-            cairo_rectangle(cr,
-                x + BUTTON_PADDING,
-                y + BUTTON_SIZE - (2 * BUTTON_PADDING),
-                BUTTON_SIZE - (2 * BUTTON_PADDING),
-                BUTTON_PADDING);
-            break;
-        default:
-            break;
+        cairo_move_to(cr,
+            button_x + BUTTON_PADDING,
+            button_y + BUTTON_PADDING);
+        cairo_line_to(cr,
+            button_x + BUTTON_SIZE - BUTTON_PADDING, 
+            button_y + BUTTON_SIZE - BUTTON_PADDING);
+        cairo_move_to(cr,
+            button_x + BUTTON_SIZE - BUTTON_PADDING, 
+            button_y + BUTTON_PADDING);
+        cairo_line_to(cr,
+            button_x + BUTTON_PADDING, 
+            button_y + BUTTON_SIZE - BUTTON_PADDING);
+    }
+    if (type == BUTTON_ARRANGE)
+    {
+        cairo_rectangle(cr,
+            button_x + BUTTON_PADDING, 
+            button_y + BUTTON_PADDING,
+            (BUTTON_SIZE - (2 * BUTTON_PADDING)) * 1.2,
+            BUTTON_SIZE - (2 * BUTTON_PADDING));
     }
 
+    // Render the defined path.
     cairo_stroke(cr);
+}
+
+void draw_buttons(Portal *portal)
+{
+    draw_button(portal, BUTTON_CLOSE);
+    // draw_button(portal, BUTTON_ARRANGE);
 }
 
 HANDLE(GlobalButtonPress)
@@ -98,12 +86,12 @@ HANDLE(GlobalButtonPress)
 
     if(is_portal_frame_area(portal, _event->x, _event->y) == false) return;
 
-    XWindowAttributes attr;
-    XGetWindowAttributes(display, portal->frame_window, &attr);
-    unsigned int frame_width = attr.width;
-
-    if(is_button_hit(_event->x, _event->y, frame_width, BUTTON_CLOSE))
+    if(is_button_area(portal, BUTTON_CLOSE, _event->x, _event->y))
     {
-        handle_close_button_click(portal->frame_window);
+        destroy_portal(portal);
+    }
+    if(is_button_area(portal, BUTTON_ARRANGE, _event->x, _event->y))
+    {
+        // TODO: Implement the arrange button.
     }
 }

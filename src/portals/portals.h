@@ -6,6 +6,7 @@ typedef struct {
     int x, y;
     unsigned int width, height;
     Window frame_window;
+    cairo_t *frame_cr;
     Window client_window;
 } Portal;
 

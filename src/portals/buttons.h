@@ -6,8 +6,12 @@
 
 typedef enum {
     BUTTON_CLOSE,
-    BUTTON_MAXIMIZE,
-    BUTTON_MINIMIZE
+    BUTTON_ARRANGE
 } ButtonType;
 
-void draw_button(cairo_t *cr, unsigned int frame_width, ButtonType type);
+/**
+ * Draws all portal buttons (E.g. close, arrange).
+ * 
+ * @param portal The portal to draw the buttons for.
+ */
+void draw_buttons(Portal *portal);

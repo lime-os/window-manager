@@ -5,7 +5,9 @@ int portals_count = 0;
 
 static Portal *register_portal(
     Display *display,
-    Window frame_window, Window client_window,
+    Window frame_window,
+    cairo_t *frame_cr,
+    Window client_window,
     int x, int y,
     unsigned int width, unsigned int height
 )
@@ -21,6 +23,7 @@ static Portal *register_portal(
     portals = buffer;
     portals[portals_count].display = display;
     portals[portals_count].frame_window = frame_window;
+    portals[portals_count].frame_cr = frame_cr;
     portals[portals_count].client_window = client_window;
     portals[portals_count].x = x;
     portals[portals_count].y = y;
@@ -85,16 +88,19 @@ Portal *create_portal(Display *display, Window client_window)
     unsigned int portal_width = client_attr.width;
     unsigned int portal_height = client_attr.height + TITLE_BAR_HEIGHT;
 
-    // Register the portal and create the frame window.
-    Portal *portal = register_portal(display,
-        0, client_window,
+    // Register the portal and create the frame.
+    Portal *portal = register_portal(
+        display,
+        0, // frame_window, will be set later.
+        NULL, // frame_cr, will be set later.
+        client_window,
         portal_x, portal_y,
         portal_width, portal_height
     );
-    Window frame_window = create_frame(portal);
-    portal->frame_window = frame_window;
+    create_frame(portal, &portal->frame_window, &portal->frame_cr);
 
     // Reparent the client window to the frame window and map both windows.
+    Window frame_window = portal->frame_window;
     XAddToSaveSet(display, client_window);
     XReparentWindow(display, client_window, frame_window, 0, TITLE_BAR_HEIGHT);
     XMapWindow(display, frame_window);

@@ -16,7 +16,6 @@
 #include <time.h>
 
 #include "limits.h"
-#include "geometry.h"
 
 #include "errors/errors.h"
 #include "atoms/atoms.h"

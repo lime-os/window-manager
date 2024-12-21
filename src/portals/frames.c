@@ -6,37 +6,29 @@ static const long frame_event_mask =
 
 static void draw_frame(Portal *portal)
 {
-    Display *display = portal->display;
-    Window frame_window = portal->frame_window;
+    cairo_t *cr = portal->frame_cr;
     unsigned int width = portal->width;
     unsigned int height = portal->height;
 
-    // Create a Cairo surface and context.
-    cairo_surface_t *surface;
-    cairo_t *cr;
-    surface = cairo_xlib_surface_create(display, frame_window, DefaultVisual(display, 0), width, height);
-    cr = cairo_create(surface);
+    // Resize the Cairo surface.
+    cairo_xlib_surface_set_size(cairo_get_target(cr), width, height);
 
     // Draw title bar.
     cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
     cairo_rectangle(cr, 0, 0, width, TITLE_BAR_HEIGHT);
     cairo_fill(cr);
 
-    // Draw close button.
-    draw_button(cr, width, BUTTON_CLOSE);
+    // Draw buttons (E.g. close, arrange).
+    draw_buttons(portal);
 
-    // Set the color for the border around the window.
+    // Draw the border around the window.
     cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
     cairo_set_line_width(cr, 2);
     cairo_rectangle(cr, 0, 0, width, height);
     cairo_stroke(cr);
-
-    // Clean up.
-    cairo_destroy(cr);
-    cairo_surface_destroy(surface);
 }
 
-Window create_frame(Portal *portal)
+void create_frame(Portal *portal, Window *out_window, cairo_t **out_cr)
 {
     Display *display = portal->display;
     int x = portal->x;
@@ -44,6 +36,7 @@ Window create_frame(Portal *portal)
     unsigned int width = portal->width;
     unsigned int height = portal->height;
 
+    // Create the frame window.
     Window frame_window = XCreateSimpleWindow(
         display,
         DefaultRootWindow(display),
@@ -52,19 +45,30 @@ Window create_frame(Portal *portal)
         2, 0x000000, 0xFFFFFF
     );
 
+    // Listen to frame window events.
     XSelectInput(display, frame_window, frame_event_mask);
 
-    return frame_window;
+    // Create the Cairo context for the frame window.
+    cairo_surface_t *surface = cairo_xlib_surface_create(
+        display,
+        frame_window,
+        DefaultVisual(display, 0),
+        width, height
+    );
+    cairo_t *cr = cairo_create(surface);
+
+    *out_window = frame_window;
+    *out_cr = cr;
 }
 
 int destroy_frame(Portal *portal)
 {
-    if(portal == NULL || portal->frame_window == 0)
-    {
-        // TODO Log in file.
-        printf("Attempted to destroy non-existant frame window.\n");
-        return -1;
-    }
+    if(portal == NULL || portal->frame_window == 0) return -1;
+
+    cairo_surface_t *surface = cairo_get_target(portal->frame_cr);
+    cairo_destroy(portal->frame_cr);
+    cairo_surface_destroy(surface);
+
     return XDestroyWindow(portal->display, portal->frame_window);
 }
 
