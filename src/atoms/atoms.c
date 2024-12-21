@@ -72,16 +72,6 @@ static void update_client_list_atom(Display *display, Window root_window) {
     );
 }
 
-/**
- * @brief Adds a window to the _NET_CLIENT_LIST atom. EWMH specification
- * requires every window manager to maintain a list of client windows this way
- * so that other applications can query it. Note that this is not the list that
- * we use internally to track client windows.
- * 
- * @param display The X11 display.
- * @param root_window The root window.
- * @param window The window to add to the list.
- */
 void add_to_client_list_atom(Display *display, Window root_window, Window window) {
     if (client_count >= client_capacity) {
         size_t new_capacity = (client_capacity == 0) ? 16 : client_capacity * 2;
@@ -100,16 +90,6 @@ void add_to_client_list_atom(Display *display, Window root_window, Window window
     update_client_list_atom(display, root_window);
 }
 
-/**
- * @brief Removes a window from the _NET_CLIENT_LIST atom. EWMH specification
- * requires every window manager to maintain a list of client windows this way
- * so that other applications can query it. Note that this is not the list that
- * we use internally to track client windows.
- * 
- * @param display The X11 display.
- * @param root_window The root window.
- * @param window The window to remove from the list.
- */
 void remove_from_client_list_atom(Display *display, Window root_window, Window window) {
     for (size_t i = 0; i < client_count; i++) {
         if (client_windows[i] == window) {
