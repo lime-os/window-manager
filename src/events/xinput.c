@@ -14,7 +14,10 @@ int xi_select_input(Display *display, Window window, long mask)
         }
     }
 
-    return XISelectEvents(display, window, &event_mask, 1);
+    int status = XISelectEvents(display, window, &event_mask, 1);
+
+    // Convert XInput2 success value (1) to standard convention (0).
+    return status == 1 ? 0 : -1;
 }
 
 int xi_get_device_type(Display *display, int device_id, int *out_device_type)
