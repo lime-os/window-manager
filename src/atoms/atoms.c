@@ -44,7 +44,7 @@ void initialize_atoms(Display *display, Window root_window)
     // See: https://specifications.freedesktop.org/wm-spec/1.5/ar01s03.html#id-1.4.12
     net_wm_name = XInternAtom(display, "_NET_WM_NAME", False);
     Atom utf8_string = XInternAtom(display, "UTF8_STRING", False);
-    const char *wm_name = "Lime Window Manager";
+    const char *wm_name = "LimeOS Window Manager";
     XChangeProperty(display, check_window, net_wm_name, utf8_string, 8, PropModeReplace, (unsigned char *)wm_name, strlen(wm_name));
 
     // Advertise supported EWMH features on root window.
