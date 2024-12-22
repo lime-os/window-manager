@@ -1,8 +1,8 @@
 #pragma once
 #include "../all.h"
 
-#define CFG_DIRECTORY "~/.config/lime"
-#define CFG_FILE_PATH "~/.config/lime/wm.config"
+#define CFG_DIRECTORY "~/.config/lime-os-wm"
+#define CFG_FILE_PATH "~/.config/lime-os-wm/config"
 
 #define CFG_MAX_LINE_LENGTH 256
 #define CFG_MAX_KEY_LENGTH 64
