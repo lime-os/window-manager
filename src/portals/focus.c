@@ -2,6 +2,7 @@
 
 static void focus_portal(Portal *portal) {
     XRaiseWindow(portal->display, portal->frame_window);
+    XSetInputFocus(portal->display, portal->frame_window, RevertToParent, CurrentTime);
 }
 
 HANDLE(GlobalButtonPress)
