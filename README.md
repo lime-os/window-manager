@@ -10,8 +10,6 @@ This window manager for X11 seamlessly blends the best of both tiled and
 floating window management. Designed with minimalism and elegance in mind,
 it aims to provide a clean and uncluttered interface while still delivering all
 the essential functionalities that users expect from a modern window manager.
-It is an ideal choice for users who seek a balance between aesthetics and 
-productivity.
 
 > **NOTE:** This project is still in development and is not ready for use.
 
