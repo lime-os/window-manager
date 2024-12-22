@@ -48,7 +48,7 @@ environment to prevent unexpected behavior.
 
 ```bash
 Xephyr -br -ac -noreset -screen 800x600 :1
-DISPLAY=:1 ./bin/lime-wm
+DISPLAY=:1 ./bin/lime-os-wm
 ```
 
 Then if you'd like, you could start an application on the new display as follows:

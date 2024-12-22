@@ -6,7 +6,7 @@ SRCDIR = src
 OBJDIR = obj
 BINDIR = bin
 
-TARGET = $(BINDIR)/lime-wm
+TARGET = $(BINDIR)/lime-os-wm
 
 SOURCES = $(shell find $(SRCDIR) -name '*.c')
 OBJECTS = $(SOURCES:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
