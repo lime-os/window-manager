@@ -6,12 +6,12 @@
 
 ###
 
-The Lime Window Manager is a window manager for X11, seamlessly blending the 
-best of both tiled and floating window management. Designed with minimalism and 
-elegance in mind, it aims to provide a clean and uncluttered interface while 
-still delivering all the essential functionalities that users expect from a 
-modern window manager. It is an ideal choice for users who seek a balance 
-between aesthetics and productivity.
+This window manager for X11 seamlessly blends the best of both tiled and 
+floating window management. Designed with minimalism and elegance in mind,
+it aims to provide a clean and uncluttered interface while still delivering all
+the essential functionalities that users expect from a modern window manager.
+It is an ideal choice for users who seek a balance between aesthetics and 
+productivity.
 
 > **NOTE:** This project is still in development and is not ready for use.
 
@@ -60,10 +60,10 @@ DISPLAY=:1 xterm &
 
 ## License
 
-The Lime Window Manager is licensed under the GPL-3.0 License. This license 
-reflects our commitment to ensuring that this software remains free and
-open-source.  We believe in the values of freedom, transparency, and
-collaboration that the GPL-3.0 promotes, allowing users to freely use, modify,
-and distribute the software, ensuring that it remains a community-driven project.
+This project is licensed under the GPL-3.0 License. This license reflects our 
+commitment to ensuring that this software remains free and open-source. 
+We believe in the values of freedom, transparency, and collaboration that the 
+GPL-3.0 promotes, allowing users to freely use, modify, and distribute the 
+software, ensuring that it remains a community-driven project.
 
 For more details, see the `LICENSE.md` file.
