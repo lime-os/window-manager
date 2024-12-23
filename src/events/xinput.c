@@ -41,17 +41,15 @@ static XEvent xi_convert_raw_mouse_event(Display *display, Window window, int ev
 {
     Window root_window, target_window;
     int mouse_root_x, mouse_root_y;
-    int unused_rel_x, unused_rel_y;
-    unsigned int unused_mask;
     bool same_screen;
     same_screen = XQueryPointer(display, window,
         &root_window,
         &target_window,
         &mouse_root_x,
         &mouse_root_y,
-        &unused_rel_x,
-        &unused_rel_y,
-        &unused_mask
+        &(int){0},
+        &(int){0},
+        &(unsigned int){0}
     );
 
     // Calculate the mouse position relative to the target window.
