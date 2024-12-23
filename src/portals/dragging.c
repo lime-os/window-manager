@@ -41,6 +41,28 @@ static void update_dragging(int mouse_root_x, int mouse_root_y, Time event_time)
 static void stop_dragging()
 {
     is_dragging = false;
+
+    // Notify the client window of the new position.
+    XConfigureEvent configure_event = {
+        .type = ConfigureNotify,
+        .display = dragged_portal->display,
+        .event = dragged_portal->client_window,
+        .window = dragged_portal->client_window,
+        .x = dragged_portal->x,
+        .y = dragged_portal->y,
+        .width = dragged_portal->width,
+        .height = dragged_portal->height - TITLE_BAR_HEIGHT,
+        .border_width = 0,
+        .above = None,
+        .override_redirect = False
+    };
+    XSendEvent(
+        dragged_portal->display,
+        dragged_portal->client_window,
+        False,
+        StructureNotifyMask,
+        (XEvent *)&configure_event
+    );
 }
 
 HANDLE(GlobalButtonPress)

@@ -54,6 +54,28 @@ static void update_resizing(int mouse_root_x, int mouse_root_y, Time event_time)
 static void stop_resizing()
 {
     is_resizing = false;
+
+    // Notify the client window of the new size.
+    XConfigureEvent configure_event = {
+        .type = ConfigureNotify,
+        .display = resized_portal->display,
+        .event = resized_portal->client_window,
+        .window = resized_portal->client_window,
+        .x = resized_portal->x,
+        .y = resized_portal->y,
+        .width = resized_portal->width,
+        .height = resized_portal->height - TITLE_BAR_HEIGHT,
+        .border_width = 0,
+        .above = None,
+        .override_redirect = False
+    };
+    XSendEvent(
+        resized_portal->display,
+        resized_portal->client_window,
+        False,
+        StructureNotifyMask,
+        (XEvent *)&configure_event
+    );
 }
 
 static bool is_resize_area(Portal *portal, int mouse_rel_x, int mouse_rel_y)
