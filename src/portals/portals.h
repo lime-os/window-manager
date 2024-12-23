@@ -10,6 +10,21 @@ typedef struct {
     Window client_window;
 } Portal;
 
+// The height of the title bar in pixels.
+#define TITLE_BAR_HEIGHT 15
+
+// The minimum width of a portal in pixels.
+#define MINIMUM_PORTAL_WIDTH 200
+
+// The minimum height of a portal in pixels.
+#define MINIMUM_PORTAL_HEIGHT 150
+
+// The maximum width of a portal as a percentage of the screen width.
+#define MAXIMUM_PORTAL_WIDTH_PERCENTAGE 0.8
+
+// The maximum height of a portal as a percentage of the screen width.
+#define MAXIMUM_PORTAL_HEIGHT_PERCENTAGE 0.8
+
 /**
  * Creates a portal and registers it to the portal registry.
  * 

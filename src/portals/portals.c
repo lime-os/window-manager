@@ -88,6 +88,28 @@ Portal *create_portal(Display *display, Window client_window)
     unsigned int portal_width = client_attr.width;
     unsigned int portal_height = client_attr.height + TITLE_BAR_HEIGHT;
 
+    // Ensure that the portal dimensions are within the limits.
+    Screen *screen = DefaultScreenOfDisplay(display);
+    int screen_width = screen->width;
+    int screen_height = screen->height;
+    if(portal_width < MINIMUM_PORTAL_WIDTH)
+    {
+        portal_width = MINIMUM_PORTAL_WIDTH;
+    }
+    if(portal_height < MINIMUM_PORTAL_HEIGHT)
+    {
+        portal_height = MINIMUM_PORTAL_HEIGHT;
+    }
+    if(portal_width > screen_width * MAXIMUM_PORTAL_WIDTH_PERCENTAGE)
+    {
+        portal_width = screen_width * MAXIMUM_PORTAL_WIDTH_PERCENTAGE;
+    }
+    if(portal_height > screen_height * MAXIMUM_PORTAL_HEIGHT_PERCENTAGE)
+    {
+        portal_height = screen_height * MAXIMUM_PORTAL_HEIGHT_PERCENTAGE;
+    }
+    XResizeWindow(display, client_window, portal_width, portal_height - TITLE_BAR_HEIGHT);
+
     // Register the portal and create the frame.
     Portal *portal = register_portal(
         display,

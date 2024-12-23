@@ -1,8 +1,6 @@
 #pragma once
 #include "../all.h"
 
-#define TITLE_BAR_HEIGHT 15
-
 /**
  * Creates a frame window and its Cairo context.
  * 
