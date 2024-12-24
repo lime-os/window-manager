@@ -4,7 +4,7 @@ static const long frame_event_mask =
     ExposureMask |
     SubstructureNotifyMask;
 
-void create_frame(Portal *portal, Window *out_window, cairo_t **out_cr)
+void create_portal_frame(Portal *portal, Window *out_window, cairo_t **out_cr)
 {
     Display *display = portal->display;
     int x = portal->x;
@@ -37,7 +37,7 @@ void create_frame(Portal *portal, Window *out_window, cairo_t **out_cr)
     *out_cr = cr;
 }
 
-int destroy_frame(Portal *portal)
+int destroy_portal_frame(Portal *portal)
 {
     if(portal == NULL || portal->frame_window == 0) return -1;
 
@@ -48,7 +48,7 @@ int destroy_frame(Portal *portal)
     return XDestroyWindow(portal->display, portal->frame_window);
 }
 
-void draw_frame(Portal *portal)
+void draw_portal_frame(Portal *portal)
 {
     cairo_t *cr = portal->frame_cr;
     unsigned int width = portal->width;
@@ -59,14 +59,14 @@ void draw_frame(Portal *portal)
 
     // Draw title bar.
     cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
-    cairo_rectangle(cr, 0, 0, width, TITLE_BAR_HEIGHT);
+    cairo_rectangle(cr, 0, 0, width, PORTAL_TITLE_BAR_HEIGHT);
     cairo_fill(cr);
 
     // Draw title within the title bar.
     draw_portal_title(portal);
 
     // Draw buttons within the title bar.
-    draw_buttons(portal);
+    draw_portal_buttons(portal);
 
     // Draw the border around the window.
     cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
@@ -86,5 +86,5 @@ HANDLE(Expose)
 
     if (_event->window != portal->frame_window) return;
 
-    draw_frame(portal);
+    draw_portal_frame(portal);
 }

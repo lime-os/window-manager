@@ -1,19 +1,19 @@
 #pragma once
 #include "../all.h"
 
-#define BUTTON_SIZE 15
-#define BUTTON_PADDING 5
+#define PORTAL_BUTTON_SIZE 15
+#define PORTAL_BUTTON_PADDING 5
 
 typedef enum {
     BUTTON_CLOSE,
     BUTTON_ARRANGE
-} ButtonType;
+} PortalButtonType;
 
 /**
  * Draws all portal buttons (E.g. close, arrange).
  * 
  * @param portal The portal to draw the buttons for.
  * 
- * @note Intended to be used by `draw_frame()`.
+ * @note Intended to be used by `draw_portal_frame()`.
  */
-void draw_buttons(Portal *portal);
+void draw_portal_buttons(Portal *portal);

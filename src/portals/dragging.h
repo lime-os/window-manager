@@ -1,4 +1,4 @@
 #pragma once
 #include "../all.h"
 
-#define DRAG_THROTTLE_MS 16
+#define PORTAL_DRAG_THROTTLE_MS 16

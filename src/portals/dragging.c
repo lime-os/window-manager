@@ -8,7 +8,7 @@ static int portal_start_x = 0, portal_start_y = 0;
 
 static Time last_drag_time = 0;
 
-static void start_dragging(Portal *portal, int mouse_root_x, int mouse_root_y)
+static void start_dragging_portal(Portal *portal, int mouse_root_x, int mouse_root_y)
 {
     is_dragging = true;
     dragged_portal = portal;
@@ -18,9 +18,9 @@ static void start_dragging(Portal *portal, int mouse_root_x, int mouse_root_y)
     mouse_start_root_y = mouse_root_y;
 }
 
-static void update_dragging(int mouse_root_x, int mouse_root_y, Time event_time)
+static void update_dragging_portal(int mouse_root_x, int mouse_root_y, Time event_time)
 {
-    if (event_time - last_drag_time < RESIZE_THROTTLE_MS) return;
+    if (event_time - last_drag_time < PORTAL_DRAG_THROTTLE_MS) return;
 
     int new_portal_x = portal_start_x + (mouse_root_x - mouse_start_root_x);
     int new_portal_y = portal_start_y + (mouse_root_y - mouse_start_root_y);
@@ -38,7 +38,7 @@ static void update_dragging(int mouse_root_x, int mouse_root_y, Time event_time)
     last_drag_time = event_time;
 }
 
-static void stop_dragging()
+static void stop_dragging_portal()
 {
     is_dragging = false;
 
@@ -51,7 +51,7 @@ static void stop_dragging()
         .x = dragged_portal->x,
         .y = dragged_portal->y,
         .width = dragged_portal->width,
-        .height = dragged_portal->height - TITLE_BAR_HEIGHT,
+        .height = dragged_portal->height - PORTAL_TITLE_BAR_HEIGHT,
         .border_width = 0,
         .above = None,
         .override_redirect = False
@@ -77,7 +77,7 @@ HANDLE(GlobalButtonPress)
 
     if (is_portal_frame_area(portal, _event->x, _event->y) == false) return;
 
-    start_dragging(portal, _event->x_root, _event->y_root);
+    start_dragging_portal(portal, _event->x_root, _event->y_root);
 }
 
 HANDLE(GlobalButtonRelease)
@@ -87,7 +87,7 @@ HANDLE(GlobalButtonRelease)
     if (_event->button != Button1) return;
     if (is_dragging == false) return;
 
-    stop_dragging();
+    stop_dragging_portal();
 }
 
 HANDLE(GlobalMotionNotify)
@@ -96,5 +96,5 @@ HANDLE(GlobalMotionNotify)
 
     if (is_dragging == false) return;
 
-    update_dragging(_event->x_root, _event->y_root, _event->time);
+    update_dragging_portal(_event->x_root, _event->y_root, _event->time);
 }

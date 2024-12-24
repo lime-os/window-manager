@@ -84,7 +84,7 @@ Portal *create_portal(Display *display, Window client_window)
     int portal_x = client_attr.x;
     int portal_y = client_attr.y;
     unsigned int portal_width = client_attr.width;
-    unsigned int portal_height = client_attr.height + TITLE_BAR_HEIGHT;
+    unsigned int portal_height = client_attr.height + PORTAL_TITLE_BAR_HEIGHT;
 
     // Ensure that the portal dimensions are within the limits.
     Screen *screen = DefaultScreenOfDisplay(display);
@@ -106,7 +106,7 @@ Portal *create_portal(Display *display, Window client_window)
     {
         portal_height = screen_height * MAXIMUM_PORTAL_HEIGHT_PERCENTAGE;
     }
-    XResizeWindow(display, client_window, portal_width, portal_height - TITLE_BAR_HEIGHT);
+    XResizeWindow(display, client_window, portal_width, portal_height - PORTAL_TITLE_BAR_HEIGHT);
 
     // Get the client window name.
     char *title = malloc(256);
@@ -122,12 +122,12 @@ Portal *create_portal(Display *display, Window client_window)
         portal_x, portal_y,
         portal_width, portal_height
     );
-    create_frame(portal, &portal->frame_window, &portal->frame_cr);
+    create_portal_frame(portal, &portal->frame_window, &portal->frame_cr);
 
     // Reparent the client window to the frame window and map both windows.
     Window frame_window = portal->frame_window;
     XAddToSaveSet(display, client_window);
-    XReparentWindow(display, client_window, frame_window, 0, TITLE_BAR_HEIGHT);
+    XReparentWindow(display, client_window, frame_window, 0, PORTAL_TITLE_BAR_HEIGHT);
     XMapWindow(display, frame_window);
     XMapWindow(display, client_window);
 
@@ -139,7 +139,7 @@ Portal *create_portal(Display *display, Window client_window)
 
 void destroy_portal(Portal *portal)
 {
-    destroy_frame(portal);
+    destroy_portal_frame(portal);
     unregister_portal(portal);
 }
 
@@ -159,13 +159,13 @@ Portal *find_portal(Window window)
 bool is_portal_frame_area(Portal *portal, int rel_x, int rel_y)
 {
     (void)portal, (void)rel_x;
-    return rel_y <= TITLE_BAR_HEIGHT;
+    return rel_y <= PORTAL_TITLE_BAR_HEIGHT;
 }
 
 bool is_portal_client_area(Portal *portal, int rel_x, int rel_y)
 {
     (void)portal, (void)rel_x;
-    return rel_y > TITLE_BAR_HEIGHT;
+    return rel_y > PORTAL_TITLE_BAR_HEIGHT;
 }
 
 HANDLE(MapRequest)

@@ -20,7 +20,7 @@ void draw_portal_title(Portal *portal)
     cairo_text_extents_t title_extents;
     cairo_text_extents(cr, portal->title, &title_extents);
     double title_x = (width - title_extents.width) / 2;
-    double title_y = (TITLE_BAR_HEIGHT + title_extents.height) / 2;
+    double title_y = (PORTAL_TITLE_BAR_HEIGHT + title_extents.height) / 2;
     cairo_move_to(cr, title_x, title_y);
 
     // Draw the title text.
@@ -43,7 +43,7 @@ HANDLE(PropertyNotify)
         if(title != NULL)
         {
             set_portal_title(portal, title);
-            draw_frame(portal);
+            draw_portal_frame(portal);
             free(title);
         }
     }

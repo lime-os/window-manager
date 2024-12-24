@@ -12,7 +12,7 @@ typedef struct {
 } Portal;
 
 // The height of the title bar in pixels.
-#define TITLE_BAR_HEIGHT 15
+#define PORTAL_TITLE_BAR_HEIGHT 15
 
 // The minimum width of a portal in pixels.
 #define MINIMUM_PORTAL_WIDTH 200

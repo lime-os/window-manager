@@ -10,7 +10,7 @@
  * @param out_window The output parameter to store the created frame window.
  * @param out_cr The output parameter to store the Cairo context for the frame.
  */
-void create_frame(Portal *portal, Window *out_window, cairo_t **out_cr);
+void create_portal_frame(Portal *portal, Window *out_window, cairo_t **out_cr);
 
 /**
  * Destroys a frame window and performs any neccessary cleanups.
@@ -18,7 +18,7 @@ void create_frame(Portal *portal, Window *out_window, cairo_t **out_cr);
  * @param portal The portal containing the frame window.
  * @return 0 if successful, non-zero integer otherwise.
  */
-int destroy_frame(Portal *portal);
+int destroy_portal_frame(Portal *portal);
 
 /**
  * Draws all frame decorations for the portal. This includes the title bar,
@@ -26,4 +26,4 @@ int destroy_frame(Portal *portal);
  * 
  * @param portal The portal to draw the frame decorations for.
  */
-void draw_frame(Portal *portal);
+void draw_portal_frame(Portal *portal);
