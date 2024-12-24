@@ -38,3 +38,10 @@ int x_get_window_name(Display *display, Window window, char *out_name, size_t na
 
     return (name != NULL) ? 0 : -1;
 }
+
+int x_error_handler(Display *display, XErrorEvent *error) {
+    char error_text[1024];
+    XGetErrorText(display, error->error_code, error_text, sizeof(error_text));
+    LOG_ERROR(error_text);
+    return 0;
+}

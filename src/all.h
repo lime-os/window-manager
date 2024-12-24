@@ -18,7 +18,6 @@
 
 #include "limits.h"
 
-#include "errors/errors.h"
 #include "config/config.h"
 #include "background/background.h"
 

@@ -8,7 +8,7 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    XSetErrorHandler(error_handler);
+    XSetErrorHandler(x_error_handler);
     
     Window root_window = DefaultRootWindow(display);
     setup_ewmh_identification_chain(display, root_window);
