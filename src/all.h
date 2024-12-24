@@ -18,9 +18,11 @@
 #include "limits.h"
 
 #include "errors/errors.h"
-#include "atoms/atoms.h"
 #include "config/config.h"
 #include "background/background.h"
+
+#include "ewmh/ewmh.h"
+#include "ewmh/client_list.h"
 
 #include "utils/utils.h"
 #include "utils/xlib.h"

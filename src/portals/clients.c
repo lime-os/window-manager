@@ -38,7 +38,7 @@ HANDLE(MapRequest)
 
     XSelectInput(display, client_window, client_event_mask);
 
-    add_to_client_list_atom(display, root_window, client_window);
+    add_to_ewmh_client_list(display, root_window, client_window);
 }
 
 HANDLE(DestroyNotify)
@@ -49,5 +49,5 @@ HANDLE(DestroyNotify)
     // safely assume that the window is a client window.
     Window client_window = _event->window;
 
-    remove_from_client_list_atom(display, root_window, client_window);
+    remove_from_ewmh_client_list(display, root_window, client_window);
 }

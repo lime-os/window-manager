@@ -12,7 +12,8 @@ int main()
     XSetErrorHandler(error_handler);
     
     Window root_window = DefaultRootWindow(display);
-    initialize_atoms(display, root_window);
+    setup_ewmh_identification_chain(display, root_window);
+    setup_ewmh_supported_list(display, root_window);
     initialize_event_loop(display, root_window);
     return 0;
 }
