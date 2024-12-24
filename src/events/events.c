@@ -71,8 +71,9 @@ void initialize_event_loop(Display *display, Window root_window)
         return;
     }
 
-    int xi_opcode, xi_first_event, xi_first_error;
-    if (!XQueryExtension(display, "XInputExtension", &xi_opcode, &xi_first_event, &xi_first_error)) {
+    int xi_opcode;
+    if (!XQueryExtension(display, "XInputExtension", &xi_opcode, &(int){0}, &(int){0}))
+    {
         // TODO Store in a log file.
         printf("XInput2 extension not available.\n");
         return;
