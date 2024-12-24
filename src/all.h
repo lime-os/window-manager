@@ -7,6 +7,7 @@
 #include <cairo/cairo.h>
 #include <cairo/cairo-xlib.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <stdbool.h>
@@ -27,6 +28,7 @@
 #include "utils/utils.h"
 #include "utils/xlib.h"
 #include "utils/xinput.h"
+#include "utils/log.h"
 
 #include "events/events.h"
 #include "events/handlers.h"

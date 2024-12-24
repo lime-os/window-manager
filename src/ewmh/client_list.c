@@ -21,15 +21,8 @@ static void update_ewmh_client_list(Display *display, Window root_window) {
 
 void add_to_ewmh_client_list(Display *display, Window root_window, Window window) {
     if (client_count >= client_capacity) {
-        size_t new_capacity = (client_capacity == 0) ? 16 : client_capacity * 2;
-        Window *new_array = realloc(client_list, new_capacity * sizeof(Window));
-        if (!new_array) {
-            // TODO Store in a log file.
-            printf("Failed to allocate memory for EWMH client list\n");
-            return;
-        }
-        client_list = new_array;
-        client_capacity = new_capacity;
+        client_capacity = (client_capacity == 0) ? 16 : client_capacity * 2;
+        client_list = realloc(client_list, client_capacity * sizeof(Window));
     }
     
     client_list[client_count++] = window;

@@ -14,7 +14,7 @@ static cairo_surface_t *load_background_image(Display *display, const char *file
     cairo_surface_t *original_image = cairo_image_surface_create_from_png(filename);
     if (cairo_surface_status(original_image) != CAIRO_STATUS_SUCCESS)
     {
-        fprintf(stderr, "Failed to load background image %s\n", filename);
+        LOG_ERROR("Failed to load background image (%s).", filename);
         return NULL;
     }
 

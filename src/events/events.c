@@ -66,16 +66,14 @@ void initialize_event_loop(Display *display, Window root_window)
 {
     if (is_event_loop_initialized == true)
     {
-        // TODO Store in a log file.
-        printf("Attempted to initialize duplicate event loop.\n");
+        LOG_ERROR("Attempted to initialize duplicate event loop.");
         return;
     }
 
     int xi_opcode;
     if (!XQueryExtension(display, "XInputExtension", &xi_opcode, &(int){0}, &(int){0}))
     {
-        // TODO Store in a log file.
-        printf("XInput2 extension not available.\n");
+        LOG_ERROR("XInput2 extension not available.");
         return;
     }
 

@@ -50,8 +50,7 @@ static void unregister_portal(Portal *portal)
     }
     if (index == -1)
     {
-        // TODO Log error in file.
-        perror("Failed to find portal in registry while unregistering portal\n");
+        LOG_ERROR("Attempted to unregister a portal that could not be found in the registry.");
         return;
     }
 
@@ -75,8 +74,7 @@ Portal *create_portal(Display *display, Window client_window)
     XWindowAttributes client_attr;
     if(XGetWindowAttributes(display, client_window, &client_attr) == 0)
     {
-        // TODO Log error in file.
-        perror("Failed to get client window attributes while creating portal\n");
+        LOG_ERROR("Failed to get client window attributes while attempting to create a portal.");
         return NULL;
     }
 

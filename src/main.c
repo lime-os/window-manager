@@ -4,8 +4,7 @@ int main()
 {
     Display *display = XOpenDisplay(NULL);
     if (!display) {
-        // TODO Store in a log file.
-        fprintf(stderr, "Failed to open display\n");
+        LOG_ERROR("Failed to open X11 display.");
         exit(EXIT_FAILURE);
     }
 

@@ -24,7 +24,7 @@ static void create_config_directory(const char *path)
     size_t path_length = strlen(path);
     if (path_length >= MAX_PATH)
     {
-        fprintf(stderr, "Configuration directory path too long: %s\n", path);
+        LOG_ERROR("Configuration directory path too long (%s).", path);
         exit(EXIT_FAILURE);
     }
 
@@ -42,7 +42,7 @@ static void create_config_directory(const char *path)
             // Create the directory if it does not exist.
             if (mkdir(buffer, 0755) != 0 && errno != EEXIST)
             {
-                fprintf(stderr, "Error while creating configuration directory %s: %s\n", buffer, strerror(errno));
+                LOG_ERROR("Failed to create configuration directory (%s).\n%s", buffer, strerror(errno));
                 exit(EXIT_FAILURE);
             }
         }
@@ -54,7 +54,7 @@ static void create_config_file(const char *path)
     FILE *config_file = fopen(path, "w");
     if (!config_file)
     {
-        perror("Could not create a default configuration file\n");
+        LOG_ERROR("Could not create the default configuration file.");
         return;
     }
 
@@ -67,7 +67,7 @@ static void parse_config_file(const char *filename)
     FILE *file = fopen(filename, "r");
     if (!file)
     {
-        perror("Could not open configuration file for parsing\n");
+        LOG_ERROR("Could not open the configuration file for parsing.");
         return;
     }
 
@@ -156,7 +156,7 @@ HANDLE(Prepare)
     char config_dir_path[MAX_PATH];
     if (expand_path(CFG_DIRECTORY, config_dir_path, sizeof(config_dir_path)) != 0)
     {
-        fprintf(stderr, "Failed to expand configuration directory path (%s)\n", CFG_FILE_PATH);
+        LOG_WARNING("Failed to expand configuration directory path (%s).", CFG_FILE_PATH);
         return;
     }
 
@@ -164,7 +164,7 @@ HANDLE(Prepare)
     char config_file_path[MAX_PATH];
     if (expand_path(CFG_FILE_PATH, config_file_path, sizeof(config_file_path)) != 0)
     {
-        fprintf(stderr, "Failed to expand configuration file path (%s)\n", CFG_FILE_PATH);
+        LOG_WARNING("Failed to expand configuration file path (%s).", CFG_FILE_PATH);
         return;
     }
 
