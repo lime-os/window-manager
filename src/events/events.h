@@ -14,5 +14,9 @@
  * 
  * @param display The X11 display.
  * @param root_window The X11 root window.
+ * 
+ * @note This function initiates an infinite loop and does not return under
+ * normal circumstances. Any code that follows this function call will be
+ * unreachable.
  */
 void initialize_event_loop(Display *display, Window root_window);
