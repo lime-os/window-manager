@@ -24,10 +24,10 @@
 
 #include "utils/utils.h"
 #include "utils/xlib.h"
+#include "utils/xinput.h"
 
 #include "events/events.h"
 #include "events/handlers.h"
-#include "events/xinput.h"
 
 #include "portals/portals.h"
 #include "portals/dragging.h"
