@@ -13,5 +13,7 @@ typedef enum {
  * Draws all portal buttons (E.g. close, arrange).
  * 
  * @param portal The portal to draw the buttons for.
+ * 
+ * @note Intended to be used by `draw_frame()`.
  */
 void draw_buttons(Portal *portal);

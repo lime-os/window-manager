@@ -1,5 +1,8 @@
 #include "../all.h"
 
+static const long client_event_mask =
+    PropertyChangeMask;
+
 static void handle_configure_request(Display *display, XConfigureRequestEvent *configure_request)
 {
     XWindowChanges changes;
@@ -32,6 +35,8 @@ HANDLE(MapRequest)
     // Considering a MapRequest event can only be sent by clients, we can
     // safely assume that the window is a client window.
     Window client_window = _event->window;
+
+    XSelectInput(display, client_window, client_event_mask);
 
     add_to_client_list_atom(display, root_window, client_window);
 }

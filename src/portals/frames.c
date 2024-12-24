@@ -4,30 +4,6 @@ static const long frame_event_mask =
     ExposureMask |
     SubstructureNotifyMask;
 
-static void draw_frame(Portal *portal)
-{
-    cairo_t *cr = portal->frame_cr;
-    unsigned int width = portal->width;
-    unsigned int height = portal->height;
-
-    // Resize the Cairo surface.
-    cairo_xlib_surface_set_size(cairo_get_target(cr), width, height);
-
-    // Draw title bar.
-    cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
-    cairo_rectangle(cr, 0, 0, width, TITLE_BAR_HEIGHT);
-    cairo_fill(cr);
-
-    // Draw buttons (E.g. close, arrange).
-    draw_buttons(portal);
-
-    // Draw the border around the window.
-    cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
-    cairo_set_line_width(cr, 2);
-    cairo_rectangle(cr, 0, 0, width, height);
-    cairo_stroke(cr);
-}
-
 void create_frame(Portal *portal, Window *out_window, cairo_t **out_cr)
 {
     Display *display = portal->display;
@@ -70,6 +46,33 @@ int destroy_frame(Portal *portal)
     cairo_surface_destroy(surface);
 
     return XDestroyWindow(portal->display, portal->frame_window);
+}
+
+void draw_frame(Portal *portal)
+{
+    cairo_t *cr = portal->frame_cr;
+    unsigned int width = portal->width;
+    unsigned int height = portal->height;
+
+    // Resize the Cairo surface.
+    cairo_xlib_surface_set_size(cairo_get_target(cr), width, height);
+
+    // Draw title bar.
+    cairo_set_source_rgb(cr, 0.1, 0.1, 0.1);
+    cairo_rectangle(cr, 0, 0, width, TITLE_BAR_HEIGHT);
+    cairo_fill(cr);
+
+    // Draw title within the title bar.
+    draw_portal_title(portal);
+
+    // Draw buttons within the title bar.
+    draw_buttons(portal);
+
+    // Draw the border around the window.
+    cairo_set_source_rgb(cr, 0.8, 0.8, 0.8);
+    cairo_set_line_width(cr, 2);
+    cairo_rectangle(cr, 0, 0, width, height);
+    cairo_stroke(cr);
 }
 
 HANDLE(Expose)

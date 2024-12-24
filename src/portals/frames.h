@@ -19,3 +19,11 @@ void create_frame(Portal *portal, Window *out_window, cairo_t **out_cr);
  * @return 0 if successful, non-zero integer otherwise.
  */
 int destroy_frame(Portal *portal);
+
+/**
+ * Draws all frame decorations for the portal. This includes the title bar,
+ * title text and buttons (E.g. close, arrange).
+ * 
+ * @param portal The portal to draw the frame decorations for.
+ */
+void draw_frame(Portal *portal);

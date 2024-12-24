@@ -20,8 +20,10 @@
 #include "errors/errors.h"
 #include "atoms/atoms.h"
 #include "config/config.h"
-#include "utils/utils.h"
 #include "background/background.h"
+
+#include "utils/utils.h"
+#include "utils/xlib.h"
 
 #include "events/events.h"
 #include "events/handlers.h"
@@ -34,3 +36,4 @@
 #include "portals/frames.h"
 #include "portals/clients.h"
 #include "portals/resizing.h"
+#include "portals/title.h"

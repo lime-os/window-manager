@@ -5,6 +5,7 @@ int portals_count = 0;
 
 static Portal *register_portal(
     Display *display,
+    const char *title,
     Window frame_window,
     cairo_t *frame_cr,
     Window client_window,
@@ -12,16 +13,16 @@ static Portal *register_portal(
     unsigned int width, unsigned int height
 )
 {
+    // Allocate additional memory for the portals registry.
     Portal *buffer = realloc(portals, (portals_count + 1) * sizeof(Portal));
-    if (buffer == NULL)
-    {
-        // TODO Log error in file.
-        perror("Failed to allocate memory while registering to portal registry\n");
-        exit(EXIT_FAILURE);
-    }
-
     portals = buffer;
+
+    // Allocate memory for the title string.
+    char *allocated_title = strdup(title);
+
+    // Set the new portal properties.
     portals[portals_count].display = display;
+    portals[portals_count].title = allocated_title;
     portals[portals_count].frame_window = frame_window;
     portals[portals_count].frame_cr = frame_cr;
     portals[portals_count].client_window = client_window;
@@ -29,6 +30,7 @@ static Portal *register_portal(
     portals[portals_count].y = y;
     portals[portals_count].width = width;
     portals[portals_count].height = height;
+
     portals_count++;
 
     return &portals[portals_count - 1];
@@ -53,22 +55,18 @@ static void unregister_portal(Portal *portal)
         return;
     }
 
+    // Free the allocated memory for the title.
+    free(portals[index].title);
+
     // Shift all elements after the found index to the left.
     for (int i = index; i < portals_count - 1; i++)
     {
         portals[i] = portals[i + 1];
     }
 
-    portals_count--;
-
     // Resize the array to the new size.
+    portals_count--;
     Portal *buffer = realloc(portals, (portals_count + 1) * sizeof(Portal));
-    if (buffer == NULL)
-    {
-        // TODO Log error in file.
-        perror("Failed to allocate memory while unregistering from portal registry\n");
-        exit(EXIT_FAILURE);
-    }
     portals = buffer;
 }
 
@@ -110,9 +108,14 @@ Portal *create_portal(Display *display, Window client_window)
     }
     XResizeWindow(display, client_window, portal_width, portal_height - TITLE_BAR_HEIGHT);
 
+    // Get the client window name.
+    char *title = malloc(256);
+    x_get_window_name(display, client_window, title, 256);
+
     // Register the portal and create the frame.
     Portal *portal = register_portal(
         display,
+        title,
         0, // frame_window, will be set later.
         NULL, // frame_cr, will be set later.
         client_window,
@@ -127,6 +130,9 @@ Portal *create_portal(Display *display, Window client_window)
     XReparentWindow(display, client_window, frame_window, 0, TITLE_BAR_HEIGHT);
     XMapWindow(display, frame_window);
     XMapWindow(display, client_window);
+
+    // Cleanup.
+    free(title);
 
     return portal;
 }

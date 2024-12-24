@@ -3,6 +3,7 @@
 
 typedef struct {
     Display *display;
+    char *title;
     int x, y;
     unsigned int width, height;
     Window frame_window;
